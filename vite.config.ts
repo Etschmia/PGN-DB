@@ -18,6 +18,21 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // React-Bibliotheken in separaten Chunk
+              'react-vendor': ['react', 'react-dom'],
+              // Schach-Bibliotheken in separaten Chunk
+              'chess-vendor': ['chess.js', 'react-chessboard'],
+              // Google Gemini API in separaten Chunk
+              'gemini-vendor': ['@google/genai'],
+            }
+          }
+        },
+        chunkSizeWarningLimit: 600,
       }
     };
 });

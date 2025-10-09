@@ -4,7 +4,7 @@ Dieses Dokument listet bekannte Probleme und Bugs in der Anwendung auf.
 
 ## PGN-Parsing-Fehler bei bestimmten Formatierungen
 
-**Status:** Offen | **Priorität:** Hoch
+**Status:** Gelöst (09.10.2025) | **Priorität:** Hoch
 
 ### Symptom
 
@@ -42,3 +42,33 @@ Eine endgültige Lösung erfordert wahrscheinlich einen fundamental anderen Ansa
 -   **Alternative Bibliothek:** Recherche und Austausch von `chess.js` gegen eine andere JavaScript-Schachbibliothek mit einem fehlertoleranteren PGN-Parser.
 -   **Fork von `chess.js`:** Erstellen eines Forks der Bibliothek und direkte Verbesserung des PGN-Parsers, um ihn robuster gegenüber gängigen Formatierungsvarianten zu machen.
 -   **Server-seitiges Parsing:** Implementierung eines kleinen Backend-Endpunkts, der die PGN-Daten empfängt, sie mit einer serverseitigen, kampferprobten Schach-Engine (z.B. `python-chess` in Python) validiert und standardisiert und eine saubere PGN-Version an das Frontend zurückgibt.
+
+### Implementierte Lösung (09.10.2025)
+
+**Ansatz:** Verbesserte Kommentar-Extraktion mit verschachtelter Klammerbehandlung
+
+Anstatt zu versuchen, Kommentare mit regulären Ausdrücken zu bereinigen, wurde eine neue Strategie implementiert:
+
+1. **Vollständige Kommentar-Extraktion:** Alle Kommentare werden zeichenweise durchlaufen und extrahiert, wobei verschachtelte geschweifte Klammern korrekt behandelt werden (Depth-Tracking).
+
+2. **Temporäre Platzhalter:** Die extrahierten Kommentare werden durch eindeutige Marker (`___COMMENT_PLACEHOLDER___`) ersetzt, sodass der verbleibende Zugtext sauber bereinigt werden kann.
+
+3. **Bereinigung des Zugtextes:** Der Text ohne Kommentare wird normalisiert (überflüssige Leerzeichen entfernt).
+
+4. **Wiederherstellung mit korrekter Formatierung:** Die Kommentare werden mit garantiertem Leerabstand vor und nach den geschweiften Klammern wieder eingefügt (`{ Kommentar }`).
+
+Diese Methode garantiert, dass:
+- Verschachtelte Klammern in Kommentaren erhalten bleiben
+- Alle Kommentare korrekt von chess.js erkannt werden
+- Fehlende Leerzeichen vor Kommentaren automatisch eingefügt werden
+- Der ursprüngliche Inhalt der Kommentare unverändert bleibt
+
+**Ergebnis:** Das Problem mit fehlenden Leerzeichen vor Kommentaren (`{`) wurde behoben. Die meisten PGN-Dateien sollten nun erfolgreich geladen werden können.
+
+### Multi-Game PGN-Unterstützung (09.10.2025)
+
+**Problem:** PGN-Dateien mit mehreren Partien (z.B. von Turnieren exportiert) führten zu Parsing-Fehlern, da chess.js nur eine einzelne Partie auf einmal verarbeiten kann.
+
+**Lösung:** Die Anwendung erkennt nun Multi-Game PGN-Dateien automatisch und lädt nur die erste Partie. Der Benutzer erhält eine Warnung, die anzeigt, wie viele Partien in der Datei enthalten sind.
+
+**Hinweis:** Um andere Partien aus einer Multi-Game-Datei zu laden, muss die gewünschte Partie manuell in eine separate Datei extrahiert werden. Eine zukünftige Erweiterung könnte eine Partie-Auswahl-Funktion implementieren.

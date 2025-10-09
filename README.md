@@ -1,27 +1,45 @@
 # Schach PGN-Datenbank
 
-Eine schicke und moderne PGN-basierte Schach-Datenbank, die im Browser läuft. Mit dieser Anwendung können Sie lokale PGN-Dateien laden, Partien analysieren, Züge kommentieren und Ihre Arbeit wieder als PGN-Datei speichern. Die Eröffnungen werden mithilfe der Google Gemini API identifiziert, um Ihnen tiefere Einblicke in Ihre Partien zu geben.
+Eine vollwertige PGN-basierte Schach-Datenbank-Anwendung, die komplett im Browser läuft. Mit dieser Anwendung können Sie hunderte oder tausende von Schachpartien importieren, verwalten, analysieren, kommentieren und durchsuchen. Alle Daten werden lokal in Ihrem Browser gespeichert (IndexedDB) - keine Server, keine Cloud, vollständige Privatsphäre.
 
-Dieses Projekt wurde mit Vite, React, TypeScript und Tailwind CSS erstellt.
+Dieses Projekt wurde mit Vite, React, TypeScript, Tailwind CSS und IndexedDB erstellt.
 
 ## Features
 
-- **PGN-Dateien laden:** Öffnen Sie PGN-Dateien von Ihrem lokalen Computer per Drag-and-Drop oder Dateiauswahl.
-- **Interaktives Schachbrett:** Visualisieren Sie die aktuelle Stellung auf einem sauberen Schachbrett (`react-chessboard`).
-- **Partie-Navigation:** Springen Sie schnell zum Anfang, zum Ende oder bewegen Sie sich zugweise vor und zurück.
-- **Zug-Historie:** Eine klickbare Liste aller Züge ermöglicht die direkte Navigation zu jeder Stellung in der Partie.
-- **Kommentar-Funktion:** Fügen Sie zu jedem Zug eigene Kommentare hinzu oder bearbeiten Sie bestehende. Ihre Anmerkungen werden beim Speichern in die PGN-Datei übernommen.
-- **PGN-Export:** Speichern Sie die Partie inklusive Ihrer neuen Kommentare als PGN-Datei auf Ihrem Computer.
-- **KI-Eröffnungsanalyse:** Die ersten Züge der Partie werden an die Google Gemini API gesendet, um den Namen und den ECO-Code der Eröffnung zu identifizieren.
-- **Modernes UI:** Eine ansprechende und responsive Benutzeroberfläche, gestaltet mit Tailwind CSS.
+### Datenbank-Management
+- **Multi-Game PGN Import:** Importieren Sie PGN-Dateien mit hunderten oder tausenden von Partien auf einmal
+- **Persistente Speicherung:** Alle Partien werden lokal in IndexedDB gespeichert und bleiben auch nach einem Browser-Neustart erhalten
+- **Tabellarische Übersicht:** Durchsuchen Sie Ihre gesamte Partien-Sammlung in einer übersichtlichen Tabelle
+- **Leistungsstarke Filter:** Suchen und filtern Sie nach:
+  - Spielernamen (Weiß oder Schwarz)
+  - Eröffnungen
+  - Datumsbereich
+  - Ergebnis (1-0, 0-1, 1/2-1/2)
+  - Benutzerdefinierten Tags
+- **Bulk-Export:** Exportieren Sie die gesamte Datenbank oder einzelne Partien als PGN-Dateien
+
+### Partie-Analyse
+- **Interaktives Schachbrett:** Visualisieren Sie jede Stellung auf einem sauberen Schachbrett (`react-chessboard`)
+- **Partie-Navigation:** Springen Sie schnell zum Anfang, zum Ende oder bewegen Sie sich zugweise vor und zurück
+- **Zug-Historie:** Eine klickbare Liste aller Züge ermöglicht die direkte Navigation zu jeder Stellung
+- **Kommentar-Funktion:** Fügen Sie zu jedem Zug eigene Kommentare hinzu oder bearbeiten Sie bestehende
+- **Tags & Notizen:** Organisieren Sie Ihre Partien mit benutzerdefinierten Tags und Notizen
+- **KI-Eröffnungsanalyse:** Die ersten Züge werden an die Google Gemini API gesendet, um den Namen und ECO-Code der Eröffnung zu identifizieren
+
+### Benutzerfreundlichkeit
+- **Modernes UI:** Eine ansprechende und responsive Benutzeroberfläche mit Tailwind CSS
+- **Zwei-Spalten-Layout:** Datenbank-Übersicht links, Partie-Viewer rechts
+- **Echtzeit-Updates:** Alle Änderungen werden sofort in der Datenbank gespeichert
+- **Vollständig offline:** Funktioniert komplett ohne Internetverbindung (außer KI-Eröffnungsanalyse)
 
 ## Tech Stack
 
 - **Frontend:** [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Datenbank:** [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) (Browser-native)
 - **Schach-Logik:** [chess.js](https://github.com/jhlywa/chess.js)
 - **Schachbrett-UI:** [react-chessboard](https://github.com/Clariity/react-chessboard)
-- **KI-Features:** [Google Gemini API](https://ai.google.dev/)
+- **KI-Features:** [Google Gemini API](https://ai.google.dev/) (optional)
 
 ## Getting Started
 
@@ -45,8 +63,9 @@ Folgen Sie diesen Schritten, um das Projekt lokal auszuführen.
     npm install
     ```
 
-3.  **API-Schlüssel einrichten:**
-    Dieses Projekt benötigt einen API-Schlüssel für die Google Gemini API.
+3.  **API-Schlüssel einrichten (optional):**
+    Die KI-Eröffnungsanalyse benötigt einen API-Schlüssel für die Google Gemini API.
+    Die Anwendung funktioniert auch ohne API-Schlüssel, aber ohne Eröffnungserkennung.
     - Erstellen Sie eine `.env`-Datei im Hauptverzeichnis des Projekts.
     - Fügen Sie Ihren API-Schlüssel wie folgt hinzu:
       ```
@@ -59,9 +78,18 @@ Folgen Sie diesen Schritten, um das Projekt lokal auszuführen.
     ```
     Die Anwendung sollte nun unter `http://localhost:5173` (oder einem anderen von Vite angegebenen Port) erreichbar sein.
 
+## Verwendung
+
+1. **PGN-Datei importieren:** Klicken Sie auf "PGN importieren" und wählen Sie eine PGN-Datei (einzelne Partie oder Multi-Game-Datei mit hunderten von Partien)
+2. **Partien durchsuchen:** Nutzen Sie die Filter- und Suchfunktionen, um Partien nach Spielernamen, Eröffnung, Datum oder Ergebnis zu finden
+3. **Partie auswählen:** Klicken Sie auf eine Zeile in der Tabelle, um die Partie anzuzeigen
+4. **Partie analysieren:** Navigieren Sie durch die Züge, fügen Sie Kommentare hinzu, setzen Sie Tags
+5. **Änderungen speichern:** Klicken Sie auf "Änderungen speichern", um Ihre Kommentare und Tags zu sichern
+6. **Exportieren:** Exportieren Sie einzelne Partien oder die gesamte Datenbank als PGN-Datei
+
 ## Bekannte Probleme
 
-Es gibt ein bekanntes, hartnäckiges Problem mit dem Parsen von PGN-Dateien mit bestimmten Formatierungen. Weitere Details finden Sie in der [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md)-Datei.
+Details zu bekannten Problemen und deren Lösungen finden Sie in der [`KNOWN_ISSUES.md`](./KNOWN_ISSUES.md)-Datei.
 
 ## Beitrag leisten
 
