@@ -11,6 +11,7 @@ export const useChessGame = () => {
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
 
   const fen = useMemo(() => {
+    console.log('[useChessGame] fen useMemo wird berechnet! currentIndex:', currentIndex, 'moves.length:', moves.length);
     const tempGame = new Chess();
     if (headers.FEN && typeof headers.FEN === 'string') {
         try {
@@ -19,12 +20,16 @@ export const useChessGame = () => {
             console.warn("Ungültige FEN im PGN-Header, verwende Standard-Startposition.");
         }
     }
+    
     for (let i = 0; i <= currentIndex; i++) {
         if(moves[i]) {
             tempGame.move({ from: moves[i].from, to: moves[i].to, promotion: moves[i].promotion });
         }
     }
-    return tempGame.fen();
+    
+    const resultFen = tempGame.fen();
+    console.log('[useChessGame] Berechnete FEN:', resultFen);
+    return resultFen;
   }, [currentIndex, moves, headers]);
 
   const loadPgn = useCallback((pgnString: string): boolean => {
@@ -153,10 +158,25 @@ export const useChessGame = () => {
       // Step 5: Restore comments with proper spacing.
       console.log('[useChessGame] Schritt 5: Stelle Kommentare wieder her...');
       commentStore.forEach((comment, index) => {
-        processedMovetext = processedMovetext.replace(
-          `${COMMENT_MARKER}_${index}_`,
-          `{ ${comment.trim()} }`
-        );
+        // Clean up special PGN tags like [%clk], [%eval], etc. that chess.js doesn't support
+        let cleanedComment = comment.trim();
+        
+        // Remove all [%...] tags (e.g., [%clk 0:10:00], [%eval 0.5])
+        cleanedComment = cleanedComment.replace(/\[%[^\]]*\]/g, '').trim();
+        
+        // Only restore the comment if there's still content after cleaning
+        if (cleanedComment) {
+          processedMovetext = processedMovetext.replace(
+            `${COMMENT_MARKER}_${index}_`,
+            `{ ${cleanedComment} }`
+          );
+        } else {
+          // If the comment is now empty, just remove the placeholder
+          processedMovetext = processedMovetext.replace(
+            new RegExp(`\\s*${COMMENT_MARKER}_${index}_\\s*`, 'g'),
+            ' '
+          );
+        }
       });
       
       // Step 6: Final cleanup.
@@ -217,9 +237,16 @@ export const useChessGame = () => {
   }, []);
 
   const goToMove = useCallback((index: number) => {
-    if (index >= -1 && index < moves.length) {
-      setCurrentIndex(index);
-    }
+    console.log('[useChessGame] goToMove aufgerufen! Index:', index, 'moves.length:', moves.length);
+    setCurrentIndex(prevIndex => {
+      if (index >= -1 && index < moves.length) {
+        console.log('[useChessGame] Setze Index von', prevIndex, 'auf', index);
+        return index;
+      } else {
+        console.warn('[useChessGame] Ungültiger Index:', index, 'muss zwischen -1 und', moves.length - 1, 'liegen');
+        return prevIndex;
+      }
+    });
   }, [moves.length]);
 
   const updateCommentForCurrentMove = useCallback((comment: string) => {

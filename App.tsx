@@ -235,10 +235,12 @@ export default function App() {
                 </div>
 
                 <div className="flex-shrink-0 w-full max-w-[600px] mx-auto aspect-square mb-4">
-                  <Suspense fallback={<div className="w-full h-full bg-slate-800 animate-pulse rounded"></div>}>
+                  <Suspense key={fen} fallback={<div className="w-full h-full bg-slate-800 animate-pulse rounded"></div>}>
                     <Chessboard
                       position={fen}
                       arePiecesDraggable={false}
+                      animationDuration={0}
+                      boardOrientation="white"
                     />
                   </Suspense>
                 </div>
