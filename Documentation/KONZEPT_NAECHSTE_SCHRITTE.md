@@ -1,0 +1,113 @@
+# Konzept: Nächste Schritte
+
+Dieses Dokument beschreibt die empfohlenen nächsten Schritte für die Weiterentwicklung der Schach PGN-Datenbank.
+
+## Priorität 1: Kritische Probleme beheben
+
+### 1.1 React 19 Kompatibilität mit react-chessboard
+
+**Problem:** Das Schachbrett aktualisiert die Position nicht korrekt beim Navigieren durch Züge.
+
+**Lösungsoptionen:**
+- **Option A:** React auf Version 18.3.1 downgraden
+  ```bash
+  npm install react@18.3.1 react-dom@18.3.1
+  ```
+- **Option B:** Wrapper-Komponente mit `key`-Prop erstellen, die bei jeder FEN-Änderung neu rendert
+- **Option C:** Alternative Schachbrett-Bibliothek evaluieren (z.B. `@chrisoakman/chessboardjs`)
+
+**Empfehlung:** Option A ist am schnellsten umzusetzen und am stabilsten.
+
+### 1.2 PGN-Parsing Stabilität
+
+**Problem:** Einige PGN-Dateien schlagen trotz Preprocessing fehl.
+
+**Maßnahmen:**
+- Weitere Edge Cases in `useChessGame.ts` dokumentieren
+- Fehlerbehandlung verbessern mit spezifischen Fehlermeldungen
+- Fallback-Modus für teilweise lesbare Dateien implementieren
+
+## Priorität 2: Code-Qualität
+
+### 2.1 ESLint und Prettier einrichten
+
+```bash
+npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier
+```
+
+Konfigurationsdateien erstellen:
+- `.eslintrc.cjs` - TypeScript-spezifische Regeln
+- `.prettierrc` - Einheitliche Formatierung
+
+### 2.2 Testing-Framework hinzufügen
+
+```bash
+npm install -D vitest @testing-library/react @testing-library/jest-dom jsdom
+```
+
+Prioritäten für Tests:
+1. `useChessGame.ts` - PGN-Parsing-Logik (kritisch)
+2. `indexedDBService.ts` - Datenbankoperationen
+3. `usePgnDatabase.ts` - Filter- und Suchlogik
+
+## Priorität 3: Funktionale Erweiterungen
+
+### 3.1 Offline-Fähigkeit (PWA)
+
+- Service Worker für Offline-Nutzung
+- Manifest-Datei für Installation auf Mobilgeräten
+- Vite PWA Plugin: `vite-plugin-pwa`
+
+### 3.2 Analysefunktionen erweitern
+
+- Stockfish-Engine im Browser integrieren (via Web Worker)
+- Zugbewertungen anzeigen
+- Beste Züge vorschlagen
+
+### 3.3 Import/Export erweitern
+
+- Drag & Drop für PGN-Dateien
+- Export als PDF mit Diagrammen
+- Lichess/Chess.com API-Integration zum direkten Import
+
+### 3.4 UI/UX Verbesserungen
+
+- Dark Mode implementieren
+- Responsive Design für Mobilgeräte verbessern
+- Tastaturnavigation für Züge (Pfeiltasten)
+
+## Priorität 4: Infrastruktur
+
+### 4.1 CI/CD Pipeline
+
+GitHub Actions Workflow erstellen (`.github/workflows/ci.yml`):
+- Build-Validierung bei Pull Requests
+- Automatische Tests
+- Deployment auf GitHub Pages oder Vercel
+
+### 4.2 Dokumentation
+
+- JSDoc-Kommentare für öffentliche Funktionen
+- Storybook für Komponenten-Dokumentation (optional)
+
+## Umsetzungsreihenfolge
+
+| Phase | Aufgabe | Geschätzter Aufwand |
+|-------|---------|---------------------|
+| 1 | React 19 Problem beheben | Klein |
+| 2 | ESLint/Prettier einrichten | Klein |
+| 3 | Vitest + erste Tests | Mittel |
+| 4 | PGN-Parsing stabilisieren | Mittel |
+| 5 | Tastaturnavigation | Klein |
+| 6 | PWA-Unterstützung | Mittel |
+| 7 | Stockfish-Integration | Groß |
+| 8 | CI/CD Pipeline | Klein |
+
+## Entscheidungen
+
+Folgende Entscheidungen sollten vor der Umsetzung getroffen werden:
+
+1. **React Version:** Downgrade auf 18.x oder Workaround für 19?
+2. **Zielgruppe:** Rein lokale Nutzung oder auch Cloud-Sync in Zukunft?
+3. **Sprache:** Bleibt die App einsprachig (Deutsch) oder soll i18n vorbereitet werden?
+4. **Engine-Analyse:** Soll Stockfish integriert werden oder reicht die Eröffnungserkennung via Gemini?
