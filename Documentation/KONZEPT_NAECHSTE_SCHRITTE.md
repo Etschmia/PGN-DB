@@ -99,7 +99,10 @@ Prioritäten für Tests:
 
 - Dark Mode implementieren
 - Responsive Design für Mobilgeräte verbessern
-- Tastaturnavigation für Züge (Pfeiltasten)
+- ✅ Tastaturnavigation für Züge (Pfeiltasten) - **Erledigt am 25.01.2026**
+  - Pfeil links/rechts: Vorheriger/Nächster Zug
+  - Home/End: Zum Anfang/Ende der Partie
+  - Automatische Deaktivierung bei fokussierten Eingabefeldern
 
 ## Priorität 4: Infrastruktur
 
@@ -123,7 +126,7 @@ GitHub Actions Workflow erstellen (`.github/workflows/ci.yml`):
 | 2 | ESLint/Prettier einrichten | Klein |
 | 3 | Vitest + erste Tests | Mittel |
 | 4 | PGN-Parsing stabilisieren | Mittel |
-| 5 | Tastaturnavigation | Klein |
+| 5 | Tastaturnavigation | ✅ Erledigt |
 | 6 | PWA-Unterstützung | Mittel |
 | 7 | Stockfish-Integration | Groß |
 | 8 | CI/CD Pipeline | Klein |

@@ -141,6 +141,50 @@ export default function App() {
 
   const currentMove: Move | undefined = moves[currentIndex];
 
+  // Tastaturnavigation für Züge
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignoriere Tastatureingaben wenn ein Eingabefeld fokussiert ist
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLInputElement ||
+        activeElement instanceof HTMLTextAreaElement ||
+        activeElement?.getAttribute('contenteditable') === 'true'
+      ) {
+        return;
+      }
+
+      // Nur navigieren wenn eine Partie geladen ist
+      if (!selectedGame || moves.length === 0) return;
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (currentIndex > -1) {
+            goToMove(currentIndex - 1);
+          }
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          if (currentIndex < moves.length - 1) {
+            goToMove(currentIndex + 1);
+          }
+          break;
+        case 'Home':
+          e.preventDefault();
+          goToMove(-1);
+          break;
+        case 'End':
+          e.preventDefault();
+          goToMove(moves.length - 1);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedGame, moves.length, currentIndex, goToMove]);
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-200 font-sans flex flex-col">
       {/* Header */}
