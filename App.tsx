@@ -4,9 +4,7 @@ import { useChessGame } from './hooks/useChessGame';
 import { usePgnDatabase } from './hooks/usePgnDatabase';
 import type { Move } from './types';
 import { ChessIcon } from './components/Icons';
-
-// Lazy-loaded Komponenten für Code-Splitting
-const Chessboard = lazy(() => import('react-chessboard').then(module => ({ default: module.Chessboard })));
+import ChessboardWrapper from './components/ChessboardWrapper';
 const DatabaseList = lazy(() => import('./components/DatabaseList'));
 const FilterBar = lazy(() => import('./components/FilterBar'));
 const DatabaseControls = lazy(() => import('./components/DatabaseControls'));
@@ -235,14 +233,7 @@ export default function App() {
                 </div>
 
                 <div className="flex-shrink-0 w-full max-w-[600px] mx-auto aspect-square mb-4">
-                  <Suspense key={fen} fallback={<div className="w-full h-full bg-slate-800 animate-pulse rounded"></div>}>
-                    <Chessboard
-                      position={fen}
-                      arePiecesDraggable={false}
-                      animationDuration={0}
-                      boardOrientation="white"
-                    />
-                  </Suspense>
+                  <ChessboardWrapper fen={fen} />
                 </div>
 
                 <div className="flex-shrink-0">

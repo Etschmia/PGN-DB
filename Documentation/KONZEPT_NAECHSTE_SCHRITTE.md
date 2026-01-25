@@ -4,19 +4,44 @@ Dieses Dokument beschreibt die empfohlenen nächsten Schritte für die Weiterent
 
 ## Priorität 1: Kritische Probleme beheben
 
-### 1.1 React 19 Kompatibilität mit react-chessboard
+### 1.1 React 19 Kompatibilität mit react-chessboard ✅ GELÖST
 
-**Problem:** Das Schachbrett aktualisiert die Position nicht korrekt beim Navigieren durch Züge.
+**Problem:** Das Schachbrett aktualisierte die Position nicht korrekt beim Navigieren durch Züge.
 
-**Lösungsoptionen:**
-- **Option A:** React auf Version 18.3.1 downgraden
-  ```bash
-  npm install react@18.3.1 react-dom@18.3.1
-  ```
-- **Option B:** Wrapper-Komponente mit `key`-Prop erstellen, die bei jeder FEN-Änderung neu rendert
-- **Option C:** Alternative Schachbrett-Bibliothek evaluieren (z.B. `@chrisoakman/chessboardjs`)
+**Lösung (umgesetzt am 25.01.2026):**
 
-**Empfehlung:** Option A ist am schnellsten umzusetzen und am stabilsten.
+1. **react-chessboard auf v5.8.6 upgraden:**
+   ```bash
+   npm install react-chessboard@5.8.6
+   ```
+
+2. **Wichtig: API-Breaking-Change beachten!**
+   Die API hat sich in v5.8.6 komplett geändert:
+
+   | Alte API (v5.6.x) | Neue API (v5.8.6) |
+   |-------------------|-------------------|
+   | `<Chessboard position={fen} />` | `<Chessboard options={{ position: fen }} />` |
+   | `arePiecesDraggable={false}` | `options.allowDragging: false` |
+   | `animationDuration={200}` | `options.animationDurationInMs: 200` |
+   | `boardOrientation="white"` | `options.boardOrientation: 'white'` |
+
+3. **ChessboardWrapper erstellt** (`components/ChessboardWrapper.tsx`):
+   ```tsx
+   import { Chessboard } from 'react-chessboard';
+
+   export default function ChessboardWrapper({ fen }: { fen: string }) {
+     const options = useMemo(() => ({
+       position: fen,
+       allowDragging: false,
+       animationDurationInMs: 200,
+       boardOrientation: 'white' as const,
+     }), [fen]);
+
+     return <Chessboard options={options} />;
+   }
+   ```
+
+**Status:** ✅ Behoben und getestet.
 
 ### 1.2 PGN-Parsing Stabilität
 
