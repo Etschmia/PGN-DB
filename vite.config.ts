@@ -1,19 +1,14 @@
 import path from 'path';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+export default defineConfig(() => {
     return {
       server: {
         port: 3000,
         host: '0.0.0.0',
       },
       plugins: [react()],
-      define: {
-        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
@@ -27,8 +22,6 @@ export default defineConfig(({ mode }) => {
               'react-vendor': ['react', 'react-dom'],
               // Schach-Bibliotheken in separaten Chunk
               'chess-vendor': ['chess.js', 'react-chessboard'],
-              // Google Gemini API in separaten Chunk
-              'gemini-vendor': ['@google/genai'],
             }
           }
         },

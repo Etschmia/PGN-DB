@@ -1,5 +1,5 @@
 {
   "name": "Schach PGN-Datenbank",
-  "description": "Eine schicke PGN-basierte Schach-Datenbank, mit der Sie lokale PGN-Dateien laden, analysieren, kommentieren und speichern können. Die Eröffnungen werden mit der Gemini-API identifiziert.",
+  "description": "Eine schicke PGN-basierte Schach-Datenbank, mit der Sie lokale PGN-Dateien laden, analysieren, kommentieren und speichern können. Eröffnungserkennung über Schachmentor-Datenbank und ECO-Katalog.",
   "requestFramePermissions": []
 }

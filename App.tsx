@@ -2,6 +2,7 @@
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useChessGame } from './hooks/useChessGame';
 import { usePgnDatabase } from './hooks/usePgnDatabase';
+import { useOpeningLookup } from './hooks/useOpeningLookup';
 import type { Move } from './types';
 import { ChessIcon } from './components/Icons';
 import ChessboardWrapper from './components/ChessboardWrapper';
@@ -13,12 +14,6 @@ const GameControls = lazy(() => import('./components/GameControls'));
 const CommentEditor = lazy(() => import('./components/CommentEditor'));
 const OpeningDisplay = lazy(() => import('./components/OpeningDisplay'));
 const TagEditor = lazy(() => import('./components/TagEditor'));
-
-// Dynamischer Import für Gemini Service
-const getOpeningName = async (pgn: string) => {
-  const { getOpeningName: getOpening } = await import('./services/geminiService');
-  return getOpening(pgn);
-};
 
 export default function App() {
   const {
@@ -52,8 +47,15 @@ export default function App() {
     getUniqueOpenings,
   } = usePgnDatabase();
 
-  const [opening, setOpening] = useState<{ name: string; eco: string } | null>(null);
-  const [isLoadingOpening, setIsLoadingOpening] = useState(false);
+  const {
+    currentOpening,
+    isTreeAvailable,
+    isLoading: isLoadingOpening,
+    lookupForPosition,
+    saveOpeningName,
+    enrichGames,
+  } = useOpeningLookup();
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -61,21 +63,20 @@ export default function App() {
   useEffect(() => {
     if (selectedGame) {
       console.log('[App] Lade ausgewählte Partie:', selectedGame.id);
-      const loaded = loadPgn(selectedGame.pgn);
-      if (loaded) {
-        // Try to get opening info
-        setIsLoadingOpening(true);
-        getOpeningName(selectedGame.pgn)
-          .then(setOpening)
-          .catch((e) => {
-            console.error('[App] Fehler beim Ermitteln der Eröffnung:', e);
-          })
-          .finally(() => setIsLoadingOpening(false));
-      }
+      loadPgn(selectedGame.pgn);
     }
   }, [selectedGame, loadPgn]);
 
-  // Handle PGN import
+  // Dynamischer Eröffnungs-Lookup bei Zugnavigation
+  useEffect(() => {
+    if (selectedGame && moves.length > 0) {
+      const moveHistory = moves.map(m => m.san);
+      const pgnHeader = { opening: selectedGame.opening, eco: selectedGame.eco };
+      lookupForPosition(moveHistory, currentIndex, pgnHeader);
+    }
+  }, [selectedGame, moves, currentIndex, lookupForPosition]);
+
+  // Handle PGN import + Hintergrund-Enrichment
   const handleImport = useCallback(async (content: string, filename: string) => {
     try {
       setError(null);
@@ -83,11 +84,14 @@ export default function App() {
       const count = await importPgnFile(content);
       setSuccess(`${count} Partie(n) erfolgreich importiert!`);
       setTimeout(() => setSuccess(null), 5000);
+
+      // Eröffnungserkennung im Hintergrund starten
+      enrichGames(games);
     } catch (e) {
       setError('Fehler beim Importieren der PGN-Datei.');
       console.error(e);
     }
-  }, [importPgnFile]);
+  }, [importPgnFile, enrichGames, games]);
 
   // Handle export current game
   const handleExportGame = useCallback(() => {
@@ -306,7 +310,13 @@ export default function App() {
                 <div className="p-4 space-y-4 overflow-auto">
                   {/* Opening Display */}
                   <Suspense fallback={<div className="animate-pulse bg-slate-700 h-20 rounded"></div>}>
-                    <OpeningDisplay opening={opening} isLoading={isLoadingOpening} />
+                    <OpeningDisplay
+                      opening={currentOpening}
+                      isLoading={isLoadingOpening}
+                      isTreeAvailable={isTreeAvailable}
+                      currentMoves={moves.slice(0, currentIndex + 1).map(m => m.san)}
+                      onSaveName={saveOpeningName}
+                    />
                   </Suspense>
 
                   {/* Move History */}
