@@ -45,6 +45,7 @@ export default function App() {
     updateFilters,
     resetFilters,
     getUniqueOpenings,
+    refreshGames,
   } = usePgnDatabase();
 
   const {
@@ -86,12 +87,13 @@ export default function App() {
       setTimeout(() => setSuccess(null), 5000);
 
       // Eröffnungserkennung im Hintergrund starten
-      enrichGames(games);
+      // enrichGames lädt Partien direkt aus IndexedDB und ruft refreshGames nach Abschluss auf
+      enrichGames(refreshGames);
     } catch (e) {
       setError('Fehler beim Importieren der PGN-Datei.');
       console.error(e);
     }
-  }, [importPgnFile, enrichGames, games]);
+  }, [importPgnFile, enrichGames, refreshGames]);
 
   // Handle export current game
   const handleExportGame = useCallback(() => {

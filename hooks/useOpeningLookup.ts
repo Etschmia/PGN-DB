@@ -23,8 +23,8 @@ export interface UseOpeningLookupReturn {
   lookupForPosition(moveHistory: string[], moveIndex: number, pgnHeader?: { opening: string; eco: string }): void;
   /** Eröffnungsname in Schachmentor speichern */
   saveOpeningName(moves: string[], name: string): Promise<boolean>;
-  /** Batch-Lookup für importierte Partien (Hintergrund) */
-  enrichGames(games: GameRecord[]): void;
+  /** Batch-Lookup für alle Partien in IndexedDB (Hintergrund). onComplete wird nach Abschluss aufgerufen. */
+  enrichGames(onComplete?: () => void): void;
 }
 
 export function useOpeningLookup(): UseOpeningLookupReturn {
@@ -77,59 +77,71 @@ export function useOpeningLookup(): UseOpeningLookupReturn {
     return false;
   }, []);
 
-  // Batch-Lookup für importierte Partien (asynchron im Hintergrund)
-  const enrichGames = useCallback((games: GameRecord[]) => {
-    // Kleine Chunks verarbeiten um UI nicht zu blockieren
-    const CHUNK_SIZE = 50;
-    let index = 0;
-
-    const processChunk = async () => {
-      const chunk = games.slice(index, index + CHUNK_SIZE);
-      if (chunk.length === 0) {
-        console.log('[useOpeningLookup] Batch-Enrichment abgeschlossen');
+  // Batch-Lookup für alle Partien in IndexedDB (asynchron im Hintergrund)
+  const enrichGames = useCallback((onComplete?: () => void) => {
+    (async () => {
+      // Partien direkt aus IndexedDB laden (nicht aus React-State, der veraltet sein kann)
+      let allGames: GameRecord[];
+      try {
+        allGames = await db.getAllGames();
+      } catch (e) {
+        console.error('[useOpeningLookup] Fehler beim Laden der Partien:', e);
         return;
       }
 
-      for (const game of chunk) {
-        if (!game.id) continue;
+      console.log(`[useOpeningLookup] Starte Batch-Enrichment für ${allGames.length} Partien`);
+      let updated = 0;
 
-        const moveHistory = extractMovesFromPgn(game.pgn);
-        const pgnHeader = { opening: game.opening, eco: game.eco };
-        const result = lookupOpeningForGame(moveHistory, pgnHeader);
+      const CHUNK_SIZE = 50;
+      let idx = 0;
 
-        if (result && result.source !== 'pgn-header') {
-          // Nur updaten wenn wir ein besseres Ergebnis als den PGN-Header haben
-          const needsUpdate =
-            result.name !== game.opening || result.eco !== game.eco;
+      const processChunk = async () => {
+        const chunk = allGames.slice(idx, idx + CHUNK_SIZE);
+        if (chunk.length === 0) {
+          console.log(`[useOpeningLookup] Batch-Enrichment abgeschlossen: ${updated} Partien aktualisiert`);
+          if (updated > 0 && onComplete) onComplete();
+          return;
+        }
 
-          if (needsUpdate) {
-            try {
-              await db.updateGame({
-                ...game,
-                opening: result.name,
-                eco: result.eco,
-                updatedAt: Date.now(),
-              });
-            } catch (e) {
-              console.error(`[useOpeningLookup] Fehler beim Update Partie ${game.id}:`, e);
+        for (const game of chunk) {
+          if (!game.id) continue;
+
+          const moveHistory = extractMovesFromPgn(game.pgn);
+          const pgnHeader = { opening: game.opening, eco: game.eco };
+          const result = lookupOpeningForGame(moveHistory, pgnHeader);
+
+          if (result && result.source !== 'pgn-header') {
+            const needsUpdate =
+              result.name !== game.opening || result.eco !== game.eco;
+
+            if (needsUpdate) {
+              try {
+                await db.updateGame({
+                  ...game,
+                  opening: result.name,
+                  eco: result.eco,
+                  updatedAt: Date.now(),
+                });
+                updated++;
+              } catch (e) {
+                console.error(`[useOpeningLookup] Fehler beim Update Partie ${game.id}:`, e);
+              }
             }
           }
         }
-      }
 
-      index += CHUNK_SIZE;
-      console.log(`[useOpeningLookup] Enrichment: ${Math.min(index, games.length)}/${games.length}`);
+        idx += CHUNK_SIZE;
+        console.log(`[useOpeningLookup] Enrichment: ${Math.min(idx, allGames.length)}/${allGames.length}`);
 
-      // Nächsten Chunk mit requestIdleCallback oder setTimeout
-      if (typeof requestIdleCallback !== 'undefined') {
-        requestIdleCallback(() => processChunk());
-      } else {
-        setTimeout(processChunk, 0);
-      }
-    };
+        if (typeof requestIdleCallback !== 'undefined') {
+          requestIdleCallback(() => processChunk());
+        } else {
+          setTimeout(processChunk, 0);
+        }
+      };
 
-    console.log(`[useOpeningLookup] Starte Batch-Enrichment für ${games.length} Partien`);
-    processChunk();
+      processChunk();
+    })();
   }, []);
 
   return {

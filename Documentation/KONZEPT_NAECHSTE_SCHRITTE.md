@@ -16,7 +16,7 @@ Dieses Dokument beschreibt die empfohlenen nächsten Schritte für die Weiterent
 | Testing-Framework | ⬜ Offen |
 | PWA-Unterstützung | ⬜ Offen |
 | CI/CD Pipeline | ⬜ Offen |
-| Eröffnungserkennung ohne Gemini | ⬜ Neu geplant (siehe 1.1) |
+| Eröffnungserkennung ohne Gemini | ✅ Erledigt (02.02.2026) |
 | Lichess/Chess.com Import | ⬜ Neu geplant (siehe 1.2) |
 | PGN Dateisystem-Export (File System Access API) | ⬜ Neu geplant (siehe 1.3) |
 | Login/Registrierung + Server-Storage | ⬜ Neu geplant (siehe 1.4) |
@@ -279,4 +279,4 @@ GitHub Actions Workflow erstellen
 | React Version: Downgrade oder Workaround? | ✅ Erledigt | React 19 + react-chessboard v5.8.6 funktioniert |
 | Zielgruppe: Lokal oder Cloud-Sync? | 🔄 In Planung | Beides — lokale Nutzung bleibt, Server-Storage kommt als Option (siehe 1.4) |
 | Sprache: Einsprachig oder i18n? | ⬜ Offen | Noch zu entscheiden |
-| Engine-Analyse: Stockfish oder Eröffnungserkennung via Gemini? | 🔄 In Planung | Eröffnungserkennung wird auf Schachmentor-DB umgestellt (siehe 1.1), Stockfish bleibt als separates Feature |
+| Engine-Analyse: Stockfish oder Eröffnungserkennung via Gemini? | ✅ Erledigt | Eröffnungserkennung auf Schachmentor-DB + ECO-Katalog umgestellt, Gemini entfernt. Stockfish bleibt als separates Feature |

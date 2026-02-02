@@ -18,27 +18,38 @@ No test or lint commands are configured.
 
 ## Architecture
 
-**Tech Stack:** React 19 + TypeScript + Vite, chess.js for move validation, react-chessboard for display, IndexedDB for local storage, Tailwind CSS (CDN), optional Google Gemini API for opening recognition.
+**Tech Stack:** React 19 + TypeScript + Vite, chess.js for move validation, react-chessboard for display, IndexedDB for local storage, Tailwind CSS (CDN).
 
 **Core Structure:**
 - `App.tsx` - Main component with React.lazy() code splitting
 - `hooks/useChessGame.ts` - Chess logic, PGN parsing, move navigation. Contains complex preprocessing pipeline (lines 42-198) that normalizes PGN files, extracts comments with nested brace handling, and removes unsupported tags like `[%clk]`
 - `hooks/usePgnDatabase.ts` - Database state, filtering, IndexedDB operations
+- `hooks/useOpeningLookup.ts` - Opening recognition: loads Schachmentor tree + ECO database, provides dynamic per-move lookup, inline-edit, and batch enrichment after import
 - `services/indexedDBService.ts` - IndexedDB CRUD operations
-- `services/geminiService.ts` - Gemini API integration for opening recognition
-- `components/` - UI components (DatabaseList, MoveHistory, CommentEditor, etc.)
+- `services/openingLookupService.ts` - Opening lookup logic: Schachmentor tree traversal (whitelist filter), ECO longest-prefix match, PGN header fallback. Also handles saving opening names to Schachmentor.
+- `data/eco-openings.json` - Static ECO database (3641 entries from lichess/chess-openings, German translations for common openings)
+- `components/` - UI components (DatabaseList, MoveHistory, CommentEditor, OpeningDisplay, etc.)
+
+**Opening Recognition (Eröffnungserkennung):**
+- Two-tier lookup: Schachmentor tree (primary, via GET localhost:3001/api/moves/slim) → static ECO database (fallback) → PGN header (last resort)
+- Schachmentor tree entries are filtered by whitelist (only entries with Wikipedia/Wikibooks link count as confirmed)
+- Dynamic: opening name updates as user navigates through moves
+- Inline editing: clicking the opening name allows setting/changing names via POST to Schachmentor API
+- After PGN import, a background enrichment process updates opening/eco fields in IndexedDB
 
 **Data Flow:**
 1. PGN file uploaded via DatabaseControls
 2. `usePgnDatabase.importPgnFile()` parses multi-game files
 3. Games persisted to IndexedDB via indexedDBService
-4. Game selection loads via `useChessGame.loadPgn()`
-5. chess.js validates moves and generates FEN positions
-6. react-chessboard renders the current position
+4. Background enrichment updates opening names from tree/ECO data
+5. Game selection loads via `useChessGame.loadPgn()`
+6. chess.js validates moves and generates FEN positions
+7. react-chessboard renders the current position
+8. Opening name updates dynamically via `useOpeningLookup` as user navigates moves
 
-## Environment Variables
+## External Dependencies
 
-Optional: Add `GEMINI_API_KEY` to `.env` file for AI-powered opening recognition.
+**Schachmentor** (optional, running on localhost:3001): Provides the curated opening tree via `/api/moves/slim`. If unavailable, the app falls back to the static ECO database. A status indicator (green/gray dot) shows connectivity.
 
 ## Known Issues
 

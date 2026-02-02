@@ -238,6 +238,7 @@ export const usePgnDatabase = () => {
     resetFilters,
     getUniqueOpenings,
     getUniqueTags,
+    refreshGames: loadGamesFromDB,
   };
 };
 
