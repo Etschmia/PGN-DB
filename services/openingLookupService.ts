@@ -31,7 +31,7 @@ export interface LookupResult {
 
 // --- Configuration ---
 
-const SCHACHMENTOR_BASE_URL = 'http://localhost:3001';
+const SCHACHMENTOR_BASE_URL = import.meta.env.DEV ? 'http://localhost:3001' : '';
 
 // --- State ---
 

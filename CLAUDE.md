@@ -9,12 +9,16 @@ Schach PGN-Datenbank (Chess PGN Database) - A browser-based chess game database 
 ## Build Commands
 
 ```bash
-npm run dev      # Start dev server on port 3000
-npm run build    # Production build
-npm run preview  # Preview production build
+bun run dev      # Start dev server on port 3000
+bun run build    # Production build
+bun run preview  # Preview production build
 ```
 
-No test or lint commands are configured.
+Uses **bun** as package manager and script runner (instead of npm). No test or lint commands are configured.
+
+## Deployment
+
+Static SPA hosted via Caddy at `pgn.martuni.de`. Build output in `dist/` is served directly — no application server needed. Caddy config at `/etc/caddy/sites/pgn.martuni.de.caddy`.
 
 ## Architecture
 
