@@ -53,9 +53,7 @@ No test or lint commands are configured.
 
 ## Known Issues
 
-**React 19 + react-chessboard compatibility:** The chessboard position may not update correctly when navigating moves. See `Documentation/NAVIGATION_DEBUG.md` for detailed debugging notes. Potential solutions include downgrading to React 18.3.1 or creating a wrapper component.
-
-**PGN Parsing:** Some malformed PGN files may fail despite preprocessing. See `Documentation/KNOWN_ISSUES.md` for edge cases and solutions.
+**PGN Parsing:** Some malformed PGN files may fail despite preprocessing.
 
 ## Debugging
 
