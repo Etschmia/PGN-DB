@@ -66,9 +66,9 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
       />
 
       {/* Statistics */}
-      <div className="bg-slate-700 rounded-lg p-3 text-center">
-        <div className="text-2xl font-bold text-cyan-400">{gameCount}</div>
-        <div className="text-sm text-slate-300">
+      <div className="bg-surface-600 rounded-lg p-3 text-center">
+        <div className="text-2xl font-bold text-accent">{gameCount}</div>
+        <div className="text-sm text-gray-400">
           {gameCount === 1 ? 'Partie' : 'Partien'} in der Datenbank
         </div>
       </div>
@@ -77,7 +77,7 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
       <button
         onClick={handleImportClick}
         disabled={isLoading}
-        className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-slate-600 disabled:cursor-not-allowed"
+        className="w-full bg-accent hover:bg-accent-light text-surface-900 font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-surface-500 disabled:text-gray-500 disabled:cursor-not-allowed"
       >
         <UploadIcon />
         {isLoading ? 'Importiere...' : 'PGN importieren'}
@@ -87,7 +87,7 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
       <button
         onClick={onExportGame}
         disabled={!hasSelectedGame}
-        className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:text-slate-400"
+        className="w-full bg-surface-600 hover:bg-surface-500 text-gray-200 font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 border border-surface-400 disabled:border-surface-500 disabled:text-gray-600 disabled:cursor-not-allowed"
       >
         <DownloadIcon />
         Aktuelle Partie exportieren
@@ -97,7 +97,7 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
       <button
         onClick={onExportDatabase}
         disabled={gameCount === 0}
-        className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:text-slate-400"
+        className="w-full bg-surface-600 hover:bg-surface-500 text-gray-200 font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 border border-surface-400 disabled:border-surface-500 disabled:text-gray-600 disabled:cursor-not-allowed"
       >
         <DownloadIcon />
         Datenbank exportieren ({gameCount})
@@ -107,7 +107,7 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
       <button
         onClick={handleClearDatabase}
         disabled={gameCount === 0}
-        className="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-slate-600 disabled:cursor-not-allowed disabled:text-slate-400"
+        className="w-full bg-red-900/50 hover:bg-red-800/50 text-red-400 font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 border border-red-900/50 disabled:bg-surface-600 disabled:border-surface-500 disabled:text-gray-600 disabled:cursor-not-allowed"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -119,9 +119,3 @@ const DatabaseControls: React.FC<DatabaseControlsProps> = ({
 };
 
 export default DatabaseControls;
-
-
-
-
-
-

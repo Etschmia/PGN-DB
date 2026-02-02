@@ -32,7 +32,7 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moves, currentIndex, onMoveSe
 
 
   return (
-    <div ref={containerRef} className="flex-grow p-3 overflow-y-auto bg-slate-800/50">
+    <div ref={containerRef} className="flex-grow p-3 overflow-y-auto bg-surface-700/50">
       <div className="grid grid-cols-[auto_1fr_1fr] gap-x-4 gap-y-1 text-sm">
         {moves.map((move, index) => {
           const isWhiteMove = move.color === 'w';
@@ -42,8 +42,8 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moves, currentIndex, onMoveSe
           return (
             <React.Fragment key={index}>
               {isWhiteMove && (
-                <div 
-                    className="text-slate-500 text-right pr-2 select-none"
+                <div
+                    className="text-gray-600 text-right pr-2 select-none"
                     onClick={() => onMoveSelect(index)}
                 >
                     {moveNumber}.
@@ -53,7 +53,7 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moves, currentIndex, onMoveSe
                 ref={isActive ? currentMoveRef : null}
                 onClick={() => onMoveSelect(index)}
                 className={`px-2 py-1 rounded cursor-pointer ${
-                  isActive ? 'bg-cyan-600 text-white font-bold' : 'hover:bg-slate-700'
+                  isActive ? 'bg-accent text-surface-900 font-bold' : 'hover:bg-surface-600'
                 } ${!isWhiteMove ? 'col-start-3' : 'col-start-2'}`}
               >
                 {move.san}

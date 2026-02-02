@@ -13,6 +13,8 @@ export default function ChessboardWrapper({ fen }: ChessboardWrapperProps) {
     allowDragging: false,
     animationDurationInMs: 200,
     boardOrientation: 'white' as const,
+    darkSquareStyle: { backgroundColor: '#B5784F' },
+    lightSquareStyle: { backgroundColor: '#E8D5B5' },
   }), [fen]);
 
   return <Chessboard options={options} />;

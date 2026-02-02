@@ -19,16 +19,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
   filteredGames,
 }) => {
   return (
-    <div className="bg-slate-800 p-4 rounded-lg space-y-3">
+    <div className="bg-surface-700 p-4 rounded-lg space-y-3">
       {/* Statistics */}
       <div className="flex items-center justify-between text-sm">
-        <span className="text-slate-300">
+        <span className="text-gray-400">
           {filteredGames} von {totalGames} Partien
         </span>
         {(filters.searchText || filters.opening || filters.dateFrom || filters.dateTo || filters.result) && (
           <button
             onClick={onResetFilters}
-            className="text-cyan-400 hover:text-cyan-300 underline text-xs"
+            className="text-accent hover:text-accent-light underline text-xs"
           >
             Filter zurücksetzen
           </button>
@@ -42,7 +42,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           placeholder="Spielername suchen..."
           value={filters.searchText}
           onChange={(e) => onUpdateFilters({ searchText: e.target.value })}
-          className="w-full px-3 py-2 bg-slate-700 text-slate-200 rounded border border-slate-600 focus:border-cyan-500 focus:outline-none"
+          className="w-full px-3 py-2 bg-surface-600 text-gray-200 rounded border border-surface-400 focus:border-accent focus:outline-none"
         />
       </div>
 
@@ -53,7 +53,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <select
             value={filters.opening}
             onChange={(e) => onUpdateFilters({ opening: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-700 text-slate-200 rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-sm"
+            className="w-full px-3 py-2 bg-surface-600 text-gray-200 rounded border border-surface-400 focus:border-accent focus:outline-none text-sm"
           >
             <option value="">Alle Eröffnungen</option>
             {uniqueOpenings.map((opening) => (
@@ -69,7 +69,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <select
             value={filters.result}
             onChange={(e) => onUpdateFilters({ result: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-700 text-slate-200 rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-sm"
+            className="w-full px-3 py-2 bg-surface-600 text-gray-200 rounded border border-surface-400 focus:border-accent focus:outline-none text-sm"
           >
             <option value="">Alle Ergebnisse</option>
             <option value="1-0">1-0 (Weiß gewinnt)</option>
@@ -86,7 +86,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             placeholder="Von Datum"
             value={filters.dateFrom}
             onChange={(e) => onUpdateFilters({ dateFrom: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-700 text-slate-200 rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-sm"
+            className="w-full px-3 py-2 bg-surface-600 text-gray-200 rounded border border-surface-400 focus:border-accent focus:outline-none text-sm"
           />
         </div>
 
@@ -97,7 +97,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
             placeholder="Bis Datum"
             value={filters.dateTo}
             onChange={(e) => onUpdateFilters({ dateTo: e.target.value })}
-            className="w-full px-3 py-2 bg-slate-700 text-slate-200 rounded border border-slate-600 focus:border-cyan-500 focus:outline-none text-sm"
+            className="w-full px-3 py-2 bg-surface-600 text-gray-200 rounded border border-surface-400 focus:border-accent focus:outline-none text-sm"
           />
         </div>
       </div>
@@ -106,9 +106,3 @@ const FilterBar: React.FC<FilterBarProps> = ({
 };
 
 export default FilterBar;
-
-
-
-
-
-

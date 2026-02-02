@@ -192,10 +192,10 @@ export default function App() {
   }, [selectedGame, moves.length, currentIndex, goToMove]);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans flex flex-col">
+    <div className="min-h-screen bg-surface-900 text-gray-200 font-sans flex flex-col">
       {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
-        <h1 className="text-3xl font-bold text-cyan-400 flex items-center gap-3">
+      <header className="bg-surface-800 border-b border-surface-500 px-6 py-4">
+        <h1 className="text-3xl font-bold text-accent flex items-center gap-3">
           <ChessIcon />
           Schach PGN-Datenbank
         </h1>
@@ -203,24 +203,24 @@ export default function App() {
 
       {/* Messages */}
       {error && (
-        <div className="bg-red-800 border-b border-red-600 text-white px-6 py-3 text-center">
+        <div className="bg-red-900/80 border-b border-red-700 text-red-200 px-6 py-3 text-center">
           <span className="block sm:inline">{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="bg-green-800 border-b border-green-600 text-white px-6 py-3 text-center">
-          <span className="block sm:inline">✓ {success}</span>
+        <div className="bg-green-900/80 border-b border-green-700 text-green-200 px-6 py-3 text-center">
+          <span className="block sm:inline">{success}</span>
         </div>
       )}
 
       {/* Main Content */}
       <main className="flex-grow flex overflow-hidden">
         {/* Left Panel - Database */}
-        <div className="w-full lg:w-2/5 xl:w-1/3 border-r border-slate-700 flex flex-col bg-slate-800">
+        <div className="w-full lg:w-2/5 xl:w-1/3 border-r border-surface-500 flex flex-col bg-surface-800">
           {/* Database Controls */}
-          <div className="p-4 border-b border-slate-700">
-            <Suspense fallback={<div className="animate-pulse bg-slate-700 h-10 rounded"></div>}>
+          <div className="p-4 border-b border-surface-500">
+            <Suspense fallback={<div className="animate-pulse bg-surface-600 h-10 rounded"></div>}>
               <DatabaseControls
                 onImport={handleImport}
                 onExportGame={handleExportGame}
@@ -234,8 +234,8 @@ export default function App() {
           </div>
 
           {/* Filter Bar */}
-          <div className="p-4 border-b border-slate-700">
-            <Suspense fallback={<div className="animate-pulse bg-slate-700 h-10 rounded"></div>}>
+          <div className="p-4 border-b border-surface-500">
+            <Suspense fallback={<div className="animate-pulse bg-surface-600 h-10 rounded"></div>}>
               <FilterBar
                 filters={filters}
                 onUpdateFilters={updateFilters}
@@ -249,7 +249,7 @@ export default function App() {
 
           {/* Database List */}
           <div className="flex-grow overflow-hidden">
-            <Suspense fallback={<div className="animate-pulse bg-slate-700 h-32 rounded m-4"></div>}>
+            <Suspense fallback={<div className="animate-pulse bg-surface-600 h-32 rounded m-4"></div>}>
               <DatabaseList
                 games={filteredGames}
                 selectedGameId={selectedGameId}
@@ -261,11 +261,11 @@ export default function App() {
         </div>
 
         {/* Right Panel - Game Viewer */}
-        <div className="flex-grow flex flex-col overflow-hidden bg-slate-900">
+        <div className="flex-grow flex flex-col overflow-hidden bg-surface-900">
           {!selectedGame ? (
-            <div className="flex-grow flex flex-col items-center justify-center text-slate-400 p-8">
-              <ChessIcon className="w-32 h-32 mb-6 text-slate-600" />
-              <p className="text-xl font-semibold">Keine Partie ausgewählt</p>
+            <div className="flex-grow flex flex-col items-center justify-center text-gray-500 p-8">
+              <ChessIcon className="w-32 h-32 mb-6 text-surface-400" />
+              <p className="text-xl font-semibold text-gray-400">Keine Partie ausgewählt</p>
               <p className="text-sm mt-2">Wählen Sie eine Partie aus der Liste oder importieren Sie eine PGN-Datei</p>
             </div>
           ) : (
@@ -273,12 +273,12 @@ export default function App() {
               {/* Chessboard Column */}
               <div className="lg:w-3/5 flex flex-col p-4 overflow-auto">
                 <div className="flex-shrink-0 mb-4">
-                  <h2 className="text-xl font-bold mb-2">
+                  <h2 className="text-xl font-bold mb-2 text-accent-light">
                     {selectedGame.white} vs {selectedGame.black}
                   </h2>
-                  <div className="text-sm text-slate-400 space-y-1">
+                  <div className="text-sm text-gray-400 space-y-1">
                     <div>{selectedGame.event} - {selectedGame.date}</div>
-                    <div>Ergebnis: <span className="font-semibold text-slate-200">{selectedGame.result}</span></div>
+                    <div>Ergebnis: <span className="font-semibold text-gray-200">{selectedGame.result}</span></div>
                   </div>
                 </div>
 
@@ -287,7 +287,7 @@ export default function App() {
                 </div>
 
                 <div className="flex-shrink-0">
-                  <Suspense fallback={<div className="animate-pulse bg-slate-700 h-12 rounded"></div>}>
+                  <Suspense fallback={<div className="animate-pulse bg-surface-600 h-12 rounded"></div>}>
                     <GameControls
                       currentIndex={currentIndex}
                       movesLength={moves.length}
@@ -300,7 +300,7 @@ export default function App() {
                 <div className="mt-4">
                   <button
                     onClick={handleSaveCurrentGame}
-                    className="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg transition-colors"
+                    className="w-full bg-accent hover:bg-accent-light text-surface-900 font-bold py-2 px-4 rounded-lg transition-colors"
                   >
                     Änderungen speichern
                   </button>
@@ -308,10 +308,10 @@ export default function App() {
               </div>
 
               {/* Info Column */}
-              <div className="lg:w-2/5 border-t lg:border-t-0 lg:border-l border-slate-700 flex flex-col overflow-hidden">
+              <div className="lg:w-2/5 border-t lg:border-t-0 lg:border-l border-surface-500 flex flex-col overflow-hidden">
                 <div className="p-4 space-y-4 overflow-auto">
                   {/* Opening Display */}
-                  <Suspense fallback={<div className="animate-pulse bg-slate-700 h-20 rounded"></div>}>
+                  <Suspense fallback={<div className="animate-pulse bg-surface-600 h-20 rounded"></div>}>
                     <OpeningDisplay
                       opening={currentOpening}
                       isLoading={isLoadingOpening}
@@ -322,17 +322,17 @@ export default function App() {
                   </Suspense>
 
                   {/* Move History */}
-                  <div className="bg-slate-800 rounded-lg overflow-hidden">
-                    <h3 className="text-lg font-semibold p-3 bg-slate-900/70">Partiezüge</h3>
+                  <div className="bg-surface-700 rounded-lg overflow-hidden">
+                    <h3 className="text-lg font-semibold p-3 bg-surface-900/70 text-accent">Partiezüge</h3>
                     <div className="max-h-[300px] overflow-auto">
-                      <Suspense fallback={<div className="animate-pulse bg-slate-700 h-32 rounded"></div>}>
+                      <Suspense fallback={<div className="animate-pulse bg-surface-600 h-32 rounded"></div>}>
                         <MoveHistory moves={moves} currentIndex={currentIndex} onMoveSelect={goToMove} />
                       </Suspense>
                     </div>
                   </div>
 
                   {/* Comment Editor */}
-                  <Suspense fallback={<div className="animate-pulse bg-slate-700 h-32 rounded"></div>}>
+                  <Suspense fallback={<div className="animate-pulse bg-surface-600 h-32 rounded"></div>}>
                     <CommentEditor
                       move={currentMove}
                       onSaveComment={updateCommentForCurrentMove}
@@ -341,7 +341,7 @@ export default function App() {
                   </Suspense>
 
                   {/* Tags and Notes */}
-                  <Suspense fallback={<div className="animate-pulse bg-slate-700 h-32 rounded"></div>}>
+                  <Suspense fallback={<div className="animate-pulse bg-surface-600 h-32 rounded"></div>}>
                     <TagEditor
                       game={selectedGame}
                       onUpdate={updateCurrentGame}

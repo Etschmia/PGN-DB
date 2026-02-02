@@ -6,22 +6,51 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Schach PGN-Datenbank</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              accent: {
+                DEFAULT: '#D4956B',
+                light: '#E8B48A',
+                dark: '#B5784F',
+              },
+              surface: {
+                900: '#0D0F11',
+                800: '#161819',
+                700: '#1C1E21',
+                600: '#23262A',
+                500: '#2D3036',
+                400: '#3D4047',
+              },
+            },
+            fontFamily: {
+              sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+            },
+          },
+        },
+      }
+    </script>
     <style>
-      /* Custom scrollbar for a more modern look */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #1e293b; /* slate-800 */
+        background: #161819;
       }
       ::-webkit-scrollbar-thumb {
-        background: #475569; /* slate-600 */
+        background: #3D4047;
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #64748b; /* slate-500 */
+        background: #D4956B;
       }
     </style>
   <script type="importmap">
@@ -36,7 +65,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-900">
+  <body class="bg-surface-900">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

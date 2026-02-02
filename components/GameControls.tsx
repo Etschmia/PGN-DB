@@ -13,7 +13,7 @@ const ControlButton: React.FC<{ onClick: () => void; disabled: boolean; children
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="bg-slate-700 hover:bg-cyan-600 disabled:bg-slate-800 disabled:text-slate-600 disabled:cursor-not-allowed text-slate-200 rounded-md p-3 transition-colors duration-200"
+      className="bg-surface-600 hover:bg-accent disabled:bg-surface-800 disabled:text-gray-700 disabled:cursor-not-allowed text-gray-200 hover:text-surface-900 rounded-md p-3 transition-colors duration-200"
     >
       {children}
     </button>

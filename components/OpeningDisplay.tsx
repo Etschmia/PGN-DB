@@ -49,19 +49,19 @@ const OpeningDisplay: React.FC<OpeningDisplayProps> = ({
     : null;
 
   return (
-    <div className="bg-slate-900/50 rounded-lg p-3">
+    <div className="bg-surface-900/50 rounded-lg p-3">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-lg font-semibold text-slate-300">Eröffnung</h3>
+        <h3 className="text-lg font-semibold text-accent">Eröffnung</h3>
         {/* Schachmentor-Verfügbarkeitsindikator */}
         <div className="flex items-center gap-1.5" title={isTreeAvailable ? 'Schachmentor verbunden' : 'Schachmentor nicht erreichbar'}>
-          <div className={`w-2 h-2 rounded-full ${isTreeAvailable ? 'bg-green-500' : 'bg-slate-500'}`} />
-          <span className="text-xs text-slate-500">SM</span>
+          <div className={`w-2 h-2 rounded-full ${isTreeAvailable ? 'bg-green-500' : 'bg-gray-600'}`} />
+          <span className="text-xs text-gray-600">SM</span>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="flex items-center gap-2 text-slate-400">
-          <div className="w-4 h-4 border-2 border-slate-500 border-t-cyan-400 rounded-full animate-spin" />
+        <div className="flex items-center gap-2 text-gray-500">
+          <div className="w-4 h-4 border-2 border-surface-400 border-t-accent rounded-full animate-spin" />
           <span>Lade Eröffnungsdaten...</span>
         </div>
       ) : isEditing ? (
@@ -73,7 +73,7 @@ const OpeningDisplay: React.FC<OpeningDisplayProps> = ({
             onChange={(e) => setEditValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isSaving}
-            className="flex-grow bg-slate-800 text-cyan-400 border border-slate-600 focus:border-cyan-500 rounded px-2 py-1 text-sm outline-none"
+            className="flex-grow bg-surface-700 text-accent border border-surface-400 focus:border-accent rounded px-2 py-1 text-sm outline-none"
             placeholder="Eröffnungsname..."
           />
           <button
@@ -85,29 +85,29 @@ const OpeningDisplay: React.FC<OpeningDisplayProps> = ({
           </button>
           <button
             onClick={() => setIsEditing(false)}
-            className="text-slate-400 hover:text-slate-300 text-sm px-2 py-1"
+            className="text-gray-500 hover:text-gray-400 text-sm px-2 py-1"
           >
             ✕
           </button>
         </div>
       ) : opening ? (
         <div
-          className={`group ${isTreeAvailable && currentMoves.length > 0 ? 'cursor-pointer hover:bg-slate-800/50 rounded -mx-1 px-1 transition-colors' : ''}`}
+          className={`group ${isTreeAvailable && currentMoves.length > 0 ? 'cursor-pointer hover:bg-surface-700/50 rounded -mx-1 px-1 transition-colors' : ''}`}
           onClick={handleEditStart}
         >
-          <p className={`font-bold ${opening.source === 'tree' ? 'text-cyan-400' : opening.source === 'eco' ? 'text-cyan-500/80' : 'text-slate-300'}`}>
+          <p className={`font-bold ${opening.source === 'tree' ? 'text-accent' : opening.source === 'eco' ? 'text-accent/80' : 'text-gray-300'}`}>
             {opening.name}
             {isTreeAvailable && currentMoves.length > 0 && (
-              <span className="ml-2 opacity-0 group-hover:opacity-50 text-xs text-slate-400 transition-opacity">bearbeiten</span>
+              <span className="ml-2 opacity-0 group-hover:opacity-50 text-xs text-gray-500 transition-opacity">bearbeiten</span>
             )}
           </p>
           <div className="flex items-center gap-2 text-sm">
-            {opening.eco && <span className="text-slate-400">{opening.eco}</span>}
-            {sourceLabel && <span className="text-slate-500 text-xs">({sourceLabel})</span>}
+            {opening.eco && <span className="text-gray-500">{opening.eco}</span>}
+            {sourceLabel && <span className="text-gray-600 text-xs">({sourceLabel})</span>}
           </div>
         </div>
       ) : (
-        <p className="text-slate-500 text-sm">
+        <p className="text-gray-600 text-sm">
           {currentMoves.length === 0 ? 'Startposition' : 'Keine Eröffnung erkannt'}
         </p>
       )}

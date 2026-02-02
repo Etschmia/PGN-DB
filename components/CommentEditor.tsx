@@ -26,7 +26,7 @@ const CommentEditor: React.FC<CommentEditorProps> = ({ move, onSaveComment, move
 
   return (
     <div key={key} className="flex flex-col gap-2">
-      <label htmlFor="comment" className="font-semibold text-slate-300">
+      <label htmlFor="comment" className="font-semibold text-gray-300">
         Kommentar zu Zug {moveIndex < 0 ? '-' : `${Math.floor(moveIndex / 2) + 1}${move?.color === 'w' ? '.' : '...'}` } {move?.san || ''}
       </label>
       <textarea
@@ -36,12 +36,12 @@ const CommentEditor: React.FC<CommentEditorProps> = ({ move, onSaveComment, move
         placeholder={isDisabled ? "Wählen Sie einen Zug, um einen Kommentar hinzuzufügen." : "Kommentar hier eingeben..."}
         disabled={isDisabled}
         rows={3}
-        className="w-full bg-slate-700 border border-slate-600 rounded-lg p-2 text-slate-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow disabled:bg-slate-800 disabled:cursor-not-allowed"
+        className="w-full bg-surface-600 border border-surface-400 rounded-lg p-2 text-gray-200 focus:ring-2 focus:ring-accent focus:outline-none transition-shadow disabled:bg-surface-800 disabled:cursor-not-allowed"
       />
       <button
         onClick={handleSave}
         disabled={isDisabled}
-        className="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-slate-700 disabled:cursor-not-allowed disabled:text-slate-500"
+        className="bg-accent hover:bg-accent-light text-surface-900 font-bold py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors duration-200 disabled:bg-surface-600 disabled:cursor-not-allowed disabled:text-gray-600"
       >
         <SaveIcon />
         Kommentar speichern

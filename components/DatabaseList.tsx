@@ -16,7 +16,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
 }) => {
   if (games.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-slate-400 p-8">
+      <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
         <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
         </svg>
@@ -36,16 +36,16 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
   return (
     <div className="overflow-auto h-full">
       <table className="w-full text-sm">
-        <thead className="bg-slate-700 sticky top-0 z-10">
+        <thead className="bg-surface-600 sticky top-0 z-10">
           <tr>
-            <th className="px-3 py-2 text-left font-semibold">Event</th>
-            <th className="px-3 py-2 text-left font-semibold">Datum</th>
-            <th className="px-3 py-2 text-left font-semibold">Weiß</th>
-            <th className="px-3 py-2 text-left font-semibold">Schwarz</th>
-            <th className="px-3 py-2 text-center font-semibold">Ergebnis</th>
-            <th className="px-3 py-2 text-left font-semibold">Eröffnung</th>
-            <th className="px-3 py-2 text-center font-semibold">Züge</th>
-            <th className="px-3 py-2 text-center font-semibold">Aktionen</th>
+            <th className="px-3 py-2 text-left font-semibold text-accent">Event</th>
+            <th className="px-3 py-2 text-left font-semibold text-accent">Datum</th>
+            <th className="px-3 py-2 text-left font-semibold text-accent">Weiß</th>
+            <th className="px-3 py-2 text-left font-semibold text-accent">Schwarz</th>
+            <th className="px-3 py-2 text-center font-semibold text-accent">Ergebnis</th>
+            <th className="px-3 py-2 text-left font-semibold text-accent">Eröffnung</th>
+            <th className="px-3 py-2 text-center font-semibold text-accent">Züge</th>
+            <th className="px-3 py-2 text-center font-semibold text-accent">Aktionen</th>
           </tr>
         </thead>
         <tbody>
@@ -54,8 +54,8 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
               key={game.id}
               onClick={() => game.id && onSelectGame(game.id)}
               className={`
-                cursor-pointer hover:bg-slate-700 transition-colors border-b border-slate-700
-                ${selectedGameId === game.id ? 'bg-cyan-900/30' : ''}
+                cursor-pointer hover:bg-surface-600 transition-colors border-b border-surface-500
+                ${selectedGameId === game.id ? 'bg-accent/10' : ''}
               `}
             >
               <td className="px-3 py-2 truncate max-w-[150px]" title={game.event}>
@@ -64,11 +64,11 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
               <td className="px-3 py-2 whitespace-nowrap">{game.date}</td>
               <td className="px-3 py-2 truncate max-w-[120px]" title={game.white}>
                 {game.white}
-                {game.whiteElo && <span className="text-slate-400 text-xs ml-1">({game.whiteElo})</span>}
+                {game.whiteElo && <span className="text-gray-500 text-xs ml-1">({game.whiteElo})</span>}
               </td>
               <td className="px-3 py-2 truncate max-w-[120px]" title={game.black}>
                 {game.black}
-                {game.blackElo && <span className="text-slate-400 text-xs ml-1">({game.blackElo})</span>}
+                {game.blackElo && <span className="text-gray-500 text-xs ml-1">({game.blackElo})</span>}
               </td>
               <td className="px-3 py-2 text-center font-semibold">
                 <span className={`
@@ -80,14 +80,14 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
                 </span>
               </td>
               <td className="px-3 py-2 truncate max-w-[200px]" title={game.opening}>
-                <span className="text-xs text-slate-400">{game.eco}</span>
+                <span className="text-xs text-gray-500">{game.eco}</span>
                 {game.opening && <span className="ml-2">{game.opening}</span>}
               </td>
-              <td className="px-3 py-2 text-center text-slate-400">{game.moveCount}</td>
+              <td className="px-3 py-2 text-center text-gray-500">{game.moveCount}</td>
               <td className="px-3 py-2 text-center">
                 <button
                   onClick={(e) => game.id && handleDelete(e, game.id)}
-                  className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-slate-600 transition-colors"
+                  className="text-red-400 hover:text-red-300 p-1 rounded hover:bg-surface-500 transition-colors"
                   title="Partie löschen"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,9 +104,3 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
 };
 
 export default DatabaseList;
-
-
-
-
-
-
