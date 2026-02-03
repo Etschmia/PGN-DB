@@ -31,6 +31,7 @@ Static SPA hosted via Caddy at `pgn.martuni.de`. Build output in `dist/` is serv
 - `hooks/useOpeningLookup.ts` - Opening recognition: loads Schachmentor tree + ECO database, provides dynamic per-move lookup, inline-edit, and batch enrichment after import
 - `services/indexedDBService.ts` - IndexedDB CRUD operations
 - `services/openingLookupService.ts` - Opening lookup logic: Schachmentor tree traversal (whitelist filter), ECO longest-prefix match, PGN header fallback. Also handles saving opening names to Schachmentor.
+- `services/lichessImportService.ts` - Online-Import: `fetchPgnFromLichess()` (Streaming via ReadableStream mit Live-Partiezähler) und `fetchPgnFromChessCom()` (paralleler Monatsarchiv-Download mit Fortschritt)
 - `data/eco-openings.json` - Static ECO database (3641 entries from lichess/chess-openings, German translations for common openings)
 - `components/` - UI components (DatabaseList, MoveHistory, CommentEditor, OpeningDisplay, etc.)
 
@@ -42,14 +43,15 @@ Static SPA hosted via Caddy at `pgn.martuni.de`. Build output in `dist/` is serv
 - After PGN import, a background enrichment process updates opening/eco fields in IndexedDB
 
 **Data Flow:**
-1. PGN file uploaded via DatabaseControls
-2. `usePgnDatabase.importPgnFile()` parses multi-game files
-3. Games persisted to IndexedDB via indexedDBService
-4. Background enrichment updates opening names from tree/ECO data
-5. Game selection loads via `useChessGame.loadPgn()`
-6. chess.js validates moves and generates FEN positions
-7. react-chessboard renders the current position
-8. Opening name updates dynamically via `useOpeningLookup` as user navigates moves
+1. PGN input via DatabaseControls: either file upload or online import (Lichess/Chess.com per username)
+2. Online import: Lichess streams PGN via ReadableStream (live game counter), Chess.com fetches monthly archives in parallel (progress per archive)
+3. `usePgnDatabase.importPgnFile()` parses multi-game files
+4. Games persisted to IndexedDB via indexedDBService
+5. Background enrichment updates opening names from tree/ECO data
+6. Game selection loads via `useChessGame.loadPgn()`
+7. chess.js validates moves and generates FEN positions
+8. react-chessboard renders the current position
+9. Opening name updates dynamically via `useOpeningLookup` as user navigates moves
 
 ## External Dependencies
 
