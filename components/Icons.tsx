@@ -47,6 +47,12 @@ export const NextIcon = () => (
     </svg>
 );
 
+export const GlobeIcon = () => (
+    <svg {...iconProps} xmlns="http://www.w3.org/2000/svg">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 012-2 1 1 0 011 1v.667a4 4 0 01-.8 2.4L13.5 12.2a1 1 0 00-.2.6v.5a1.5 1.5 0 01-1.5 1.5 1.5 1.5 0 01-1.5-1.5V12a2 2 0 00-.586-1.414L8.3 9.172A2 2 0 007 8.586V8.5a.5.5 0 00-.5-.5 1.982 1.982 0 01-1.74-.527l-.428-.396z" clipRule="evenodd" />
+    </svg>
+);
+
 export const ChessIcon = ({ className = "w-8 h-8" } : {className?: string}) => (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2C10.3431 2 9 3.34315 9 5V6H15V5C15 3.34315 13.6569 2 12 2Z" fill="currentColor"/>

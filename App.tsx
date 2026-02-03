@@ -147,6 +147,15 @@ export default function App() {
 
   const currentMove: Move | undefined = moves[currentIndex];
 
+  // TimeControl formatieren: "300+0" → "5+0", "900+10" → "15+10"
+  const formatTimeControl = (tc: string | undefined): string | null => {
+    if (!tc || tc === '-') return null;
+    const match = tc.match(/^(\d+)\+(\d+)$/);
+    if (!match) return tc;
+    const minutes = Math.round(parseInt(match[1]) / 60);
+    return `${minutes}+${match[2]}`;
+  };
+
   // Tastaturnavigation für Züge
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -320,6 +329,19 @@ export default function App() {
                       onSaveName={saveOpeningName}
                     />
                   </Suspense>
+
+                  {/* Event & Zeitmodus */}
+                  {selectedGame.event && (
+                    <div className="text-sm text-gray-400 flex items-center gap-2">
+                      <span>{selectedGame.event}</span>
+                      {formatTimeControl(headers.TimeControl) && (
+                        <span className="text-gray-500">·</span>
+                      )}
+                      {formatTimeControl(headers.TimeControl) && (
+                        <span className="font-mono text-gray-300">{formatTimeControl(headers.TimeControl)}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Move History */}
                   <div className="bg-surface-700 rounded-lg overflow-hidden">

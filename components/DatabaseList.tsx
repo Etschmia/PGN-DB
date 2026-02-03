@@ -38,7 +38,6 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
       <table className="w-full text-sm">
         <thead className="bg-surface-600 sticky top-0 z-10">
           <tr>
-            <th className="px-3 py-2 text-left font-semibold text-accent">Event</th>
             <th className="px-3 py-2 text-left font-semibold text-accent">Datum</th>
             <th className="px-3 py-2 text-left font-semibold text-accent">Weiß</th>
             <th className="px-3 py-2 text-left font-semibold text-accent">Schwarz</th>
@@ -58,9 +57,6 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
                 ${selectedGameId === game.id ? 'bg-accent/10' : ''}
               `}
             >
-              <td className="px-3 py-2 truncate max-w-[150px]" title={game.event}>
-                {game.event}
-              </td>
               <td className="px-3 py-2 whitespace-nowrap">{game.date}</td>
               <td className="px-3 py-2 truncate max-w-[120px]" title={game.white}>
                 {game.white}
