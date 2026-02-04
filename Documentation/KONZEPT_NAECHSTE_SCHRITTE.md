@@ -17,8 +17,8 @@ Dieses Dokument beschreibt die empfohlenen nächsten Schritte für die Weiterent
 | PWA-Unterstützung | ⬜ Offen |
 | CI/CD Pipeline | ⬜ Offen |
 | Eröffnungserkennung ohne Gemini | ✅ Erledigt (02.02.2026) |
-| Lichess/Chess.com Import | ⬜ Neu geplant (siehe 1.2) |
-| PGN Dateisystem-Export (File System Access API) | ⬜ Neu geplant (siehe 1.3) |
+| Lichess/Chess.com Import | ✅ Erledigt (02.02.2026) |
+| PGN Dateisystem-Export (File System Access API) | ✅ Erledigt (04.02.2026) |
 | Login/Registrierung + Server-Storage | ⬜ Neu geplant (siehe 1.4) |
 
 ---

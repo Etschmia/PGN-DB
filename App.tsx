@@ -96,22 +96,22 @@ export default function App() {
   }, [importPgnFile, enrichGames, refreshGames]);
 
   // Handle export current game
-  const handleExportGame = useCallback(() => {
+  const handleExportGame = useCallback(async () => {
     if (!selectedGame) return;
-    
+
     // Get updated PGN with comments
     const updatedPgn = generatePgnWithComments();
     const updatedGame = {
       ...selectedGame,
       pgn: updatedPgn,
     };
-    
-    exportGame(updatedGame);
+
+    await exportGame(updatedGame);
   }, [selectedGame, generatePgnWithComments, exportGame]);
 
   // Handle export database
-  const handleExportDatabase = useCallback(() => {
-    exportDatabase(`chess-database-${new Date().toISOString().split('T')[0]}.pgn`);
+  const handleExportDatabase = useCallback(async () => {
+    await exportDatabase(`chess-database-${new Date().toISOString().split('T')[0]}.pgn`);
   }, [exportDatabase]);
 
   // Handle clear database

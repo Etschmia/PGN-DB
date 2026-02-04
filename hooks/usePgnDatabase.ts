@@ -3,6 +3,41 @@ import type { GameRecord, GameFilters } from '../types';
 import * as db from '../services/indexedDBService';
 import { parseMultiGamePgn } from './useChessGame';
 
+// Datei speichern: File System Access API (Chrome/Edge) mit Blob-Fallback (Firefox/Safari)
+const saveFile = async (content: string, filename: string): Promise<void> => {
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await (window as any).showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: 'PGN-Datei',
+          accept: { 'application/x-chess-pgn': ['.pgn'] },
+        }],
+      });
+      const writable = await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      console.log('[usePgnDatabase] Datei gespeichert via File System Access API:', filename);
+      return;
+    } catch (err: any) {
+      if (err?.name === 'AbortError') return; // Nutzer hat Dialog abgebrochen
+      console.warn('[usePgnDatabase] File System Access API fehlgeschlagen, nutze Fallback:', err);
+    }
+  }
+
+  // Fallback: klassischer Blob-Download
+  const blob = new Blob([content], { type: 'application/vnd.chess-pgn' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  console.log('[usePgnDatabase] Datei gespeichert via Blob-Download:', filename);
+};
+
 export const usePgnDatabase = () => {
   const [games, setGames] = useState<GameRecord[]>([]);
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
@@ -105,31 +140,16 @@ export const usePgnDatabase = () => {
   }, [selectedGameId, loadGamesFromDB]);
 
   // Export a single game as PGN
-  const exportGame = useCallback((game: GameRecord, filename?: string): void => {
-    const blob = new Blob([game.pgn], { type: 'application/vnd.chess-pgn' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename || `${game.white}_vs_${game.black}_${game.date}.pgn`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    console.log('[usePgnDatabase] Partie exportiert:', filename);
+  const exportGame = useCallback(async (game: GameRecord, filename?: string): Promise<void> => {
+    const name = filename || `${game.white}_vs_${game.black}_${game.date}.pgn`;
+    await saveFile(game.pgn, name);
+    console.log('[usePgnDatabase] Partie exportiert:', name);
   }, []);
 
   // Export all games as multi-game PGN
-  const exportDatabase = useCallback((filename: string = 'database.pgn'): void => {
+  const exportDatabase = useCallback(async (filename: string = 'database.pgn'): Promise<void> => {
     const multiGamePgn = games.map(g => g.pgn).join('\n\n');
-    const blob = new Blob([multiGamePgn], { type: 'application/vnd.chess-pgn' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    await saveFile(multiGamePgn, filename);
     console.log('[usePgnDatabase] Datenbank exportiert:', games.length, 'Partien');
   }, [games]);
 
