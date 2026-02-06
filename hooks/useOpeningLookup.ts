@@ -10,7 +10,7 @@ import {
   extractMovesFromPgn,
   type LookupResult,
 } from '../services/openingLookupService';
-import * as db from '../services/indexedDBService';
+import * as db from '../services/storageService';
 
 export interface UseOpeningLookupReturn {
   /** Aktueller Eröffnungsname für angezeigte Position */

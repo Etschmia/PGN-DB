@@ -1,0 +1,37 @@
+pgn.martuni.de {
+	encode gzip
+
+	log {
+		output file /var/log/caddy/pgn.access.log {
+			roll_size 10mb
+			roll_keep 10
+			roll_keep_for 90d
+		}
+		format json
+	}
+
+	# PGN-Datenbank Backend (Auth + Games)
+	handle /api/pgn/* {
+		reverse_proxy localhost:3003
+	}
+
+	# Schachmentor API (bleibt wie bisher)
+	handle /api/* {
+		reverse_proxy localhost:3001
+	}
+
+	# SPA static files
+	handle {
+		root * /home/librechat/pgn-db/dist
+
+		@html path /index.html
+		header @html Cache-Control "no-cache"
+
+		header {
+			Cache-Control "public, max-age=31536000, immutable"
+		}
+
+		try_files {path} /index.html
+		file_server
+	}
+}

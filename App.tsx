@@ -3,9 +3,11 @@ import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { useChessGame } from './hooks/useChessGame';
 import { usePgnDatabase } from './hooks/usePgnDatabase';
 import { useOpeningLookup } from './hooks/useOpeningLookup';
+import { useAuth } from './hooks/useAuth';
 import type { Move } from './types';
 import { ChessIcon } from './components/Icons';
 import ChessboardWrapper from './components/ChessboardWrapper';
+import AuthBar from './components/AuthBar';
 const DatabaseList = lazy(() => import('./components/DatabaseList'));
 const FilterBar = lazy(() => import('./components/FilterBar'));
 const DatabaseControls = lazy(() => import('./components/DatabaseControls'));
@@ -57,8 +59,35 @@ export default function App() {
     enrichGames,
   } = useOpeningLookup();
 
+  const {
+    user,
+    isAuthenticated,
+    isLoading: isLoadingAuth,
+    storageInfo,
+    login,
+    register,
+    logout,
+    refreshStorageInfo,
+  } = useAuth();
+
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // ?verified=1 URL-Parameter nach Email-Verifizierung erkennen
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === '1') {
+      setSuccess('Email-Adresse erfolgreich bestätigt! Sie sind jetzt eingeloggt.');
+      setTimeout(() => setSuccess(null), 6000);
+      window.history.replaceState({}, '', '/');
+    } else if (params.get('verify') === 'expired') {
+      setError('Der Bestätigungslink ist abgelaufen. Bitte registrieren Sie sich erneut.');
+      window.history.replaceState({}, '', '/');
+    } else if (params.get('verify') === 'error') {
+      setError('Fehler bei der Email-Bestätigung. Bitte versuchen Sie es erneut.');
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
 
   // Load selected game into chess viewer
   useEffect(() => {
@@ -87,13 +116,16 @@ export default function App() {
       setTimeout(() => setSuccess(null), 5000);
 
       // Eröffnungserkennung im Hintergrund starten
-      // enrichGames lädt Partien direkt aus IndexedDB und ruft refreshGames nach Abschluss auf
+      // enrichGames lädt Partien direkt aus Storage und ruft refreshGames nach Abschluss auf
       enrichGames(refreshGames);
+
+      // Speicheranzeige aktualisieren wenn eingeloggt
+      if (isAuthenticated) refreshStorageInfo();
     } catch (e) {
       setError('Fehler beim Importieren der PGN-Datei.');
       console.error(e);
     }
-  }, [importPgnFile, enrichGames, refreshGames]);
+  }, [importPgnFile, enrichGames, refreshGames, isAuthenticated, refreshStorageInfo]);
 
   // Handle export current game
   const handleExportGame = useCallback(async () => {
@@ -120,11 +152,12 @@ export default function App() {
       await clearDatabase();
       setSuccess('Datenbank erfolgreich geleert!');
       setTimeout(() => setSuccess(null), 3000);
+      if (isAuthenticated) refreshStorageInfo();
     } catch (e) {
       setError('Fehler beim Leeren der Datenbank.');
       console.error(e);
     }
-  }, [clearDatabase]);
+  }, [clearDatabase, isAuthenticated, refreshStorageInfo]);
 
   // Save changes to current game (comments, tags, notes)
   const handleSaveCurrentGame = useCallback(async () => {
@@ -203,11 +236,21 @@ export default function App() {
   return (
     <div className="min-h-screen bg-surface-900 text-gray-200 font-sans flex flex-col">
       {/* Header */}
-      <header className="bg-surface-800 border-b border-surface-500 px-6 py-4">
+      <header className="bg-surface-800 border-b border-surface-500 px-6 py-4 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-accent flex items-center gap-3">
           <ChessIcon />
           Schach PGN-Datenbank
         </h1>
+        {!isLoadingAuth && (
+          <AuthBar
+            user={user}
+            isAuthenticated={isAuthenticated}
+            storageInfo={storageInfo}
+            onLogin={login}
+            onRegister={register}
+            onLogout={logout}
+          />
+        )}
       </header>
 
       {/* Messages */}

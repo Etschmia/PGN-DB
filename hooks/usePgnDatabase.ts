@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { GameRecord, GameFilters } from '../types';
-import * as db from '../services/indexedDBService';
+import * as db from '../services/storageService';
 import { parseMultiGamePgn } from './useChessGame';
 
 // Datei speichern: File System Access API (Chrome/Edge) mit Blob-Fallback (Firefox/Safari)

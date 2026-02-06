@@ -43,3 +43,15 @@ export interface GameFilters {
   result: string;
   tags: string[];
 }
+
+export interface AuthUser {
+  id: number;
+  email: string;
+  createdAt?: string;
+}
+
+export interface StorageInfo {
+  usedBytes: number;
+  maxBytes: number;
+  percentage: number;
+}

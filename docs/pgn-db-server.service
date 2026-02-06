@@ -1,0 +1,22 @@
+[Unit]
+Description=PGN-Datenbank Backend Service
+After=network.target postgresql.service
+
+[Service]
+User=librechat
+Group=librechat
+WorkingDirectory=/home/librechat/pgn-db/server
+Environment="PATH=/home/librechat/.bun/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="NODE_ENV=production"
+
+ExecStart=/home/librechat/.bun/bin/bun run server.js
+
+StandardOutput=append:/home/librechat/pgn-db/server/server.log
+StandardError=append:/home/librechat/pgn-db/server/server.log
+
+Restart=on-failure
+RestartSec=10
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
