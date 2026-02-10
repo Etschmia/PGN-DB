@@ -67,13 +67,16 @@ export default function App() {
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
     refreshStorageInfo,
   } = useAuth();
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
-  // ?verified=1 URL-Parameter nach Email-Verifizierung erkennen
+  // URL-Parameter erkennen
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('verified') === '1') {
@@ -85,6 +88,9 @@ export default function App() {
       window.history.replaceState({}, '', '/');
     } else if (params.get('verify') === 'error') {
       setError('Fehler bei der Email-Bestätigung. Bitte versuchen Sie es erneut.');
+      window.history.replaceState({}, '', '/');
+    } else if (params.get('reset-token')) {
+      setResetToken(params.get('reset-token'));
       window.history.replaceState({}, '', '/');
     }
   }, []);
@@ -249,6 +255,14 @@ export default function App() {
             onLogin={login}
             onRegister={register}
             onLogout={logout}
+            onForgotPassword={forgotPassword}
+            onResetPassword={async (token, password) => {
+              await resetPassword(token, password);
+              setResetToken(null);
+              setSuccess('Passwort erfolgreich geändert! Sie sind jetzt eingeloggt.');
+              setTimeout(() => setSuccess(null), 6000);
+            }}
+            resetToken={resetToken}
           />
         )}
       </header>

@@ -8,21 +8,31 @@ interface AuthBarProps {
   onLogin: (email: string, password: string) => Promise<void>;
   onRegister: (email: string, password: string) => Promise<string>;
   onLogout: () => Promise<void>;
+  onForgotPassword: (email: string) => Promise<string>;
+  onResetPassword: (token: string, password: string) => Promise<void>;
+  resetToken: string | null;
 }
 
-type AuthView = 'none' | 'login' | 'register';
+type AuthView = 'none' | 'login' | 'register' | 'forgot' | 'reset';
 
-export default function AuthBar({ user, isAuthenticated, storageInfo, onLogin, onRegister, onLogout }: AuthBarProps) {
-  const [view, setView] = useState<AuthView>('none');
+export default function AuthBar({ user, isAuthenticated, storageInfo, onLogin, onRegister, onLogout, onForgotPassword, onResetPassword, resetToken }: AuthBarProps) {
+  const [view, setView] = useState<AuthView>(resetToken ? 'reset' : 'none');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset-Token von URL: View automatisch öffnen
+  React.useEffect(() => {
+    if (resetToken) setView('reset');
+  }, [resetToken]);
+
   const resetForm = () => {
     setEmail('');
     setPassword('');
+    setPasswordConfirm('');
     setError('');
     setMessage('');
     setView('none');
@@ -51,6 +61,41 @@ export default function AuthBar({ user, isAuthenticated, storageInfo, onLogin, o
       setMessage(msg);
       setEmail('');
       setPassword('');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+    try {
+      const msg = await onForgotPassword(email);
+      setMessage(msg);
+      setEmail('');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password !== passwordConfirm) {
+      setError('Passwörter stimmen nicht überein');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await onResetPassword(resetToken!, password);
+      resetForm();
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -105,7 +150,78 @@ export default function AuthBar({ user, isAuthenticated, storageInfo, onLogin, o
     );
   }
 
-  // Formular
+  // Forgot-Password-Formular
+  if (view === 'forgot') {
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        {message ? (
+          <div className="flex items-center gap-2">
+            <span className="text-green-400">{message}</span>
+            <button onClick={resetForm} className="text-gray-500 hover:text-gray-300">✕</button>
+          </div>
+        ) : (
+          <form onSubmit={handleForgotPassword} className="flex items-center gap-2">
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email-Adresse"
+              required
+              className="bg-surface-700 border border-surface-500 rounded px-2 py-1 text-sm text-gray-200 w-48 focus:border-accent focus:outline-none"
+            />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-accent hover:bg-accent-light text-surface-900 font-semibold px-3 py-1 rounded text-sm transition-colors disabled:opacity-50"
+            >
+              {isSubmitting ? '...' : 'Link senden'}
+            </button>
+            <button type="button" onClick={() => { setError(''); setView('login'); }} className="text-gray-500 hover:text-gray-300">✕</button>
+            {error && <span className="text-red-400 text-xs max-w-48 truncate" title={error}>{error}</span>}
+          </form>
+        )}
+      </div>
+    );
+  }
+
+  // Reset-Password-Formular
+  if (view === 'reset') {
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        <form onSubmit={handleResetPassword} className="flex items-center gap-2">
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="Neues Passwort (min. 8)"
+            required
+            minLength={8}
+            className="bg-surface-700 border border-surface-500 rounded px-2 py-1 text-sm text-gray-200 w-40 focus:border-accent focus:outline-none"
+          />
+          <input
+            type="password"
+            value={passwordConfirm}
+            onChange={e => setPasswordConfirm(e.target.value)}
+            placeholder="Passwort bestätigen"
+            required
+            minLength={8}
+            className="bg-surface-700 border border-surface-500 rounded px-2 py-1 text-sm text-gray-200 w-40 focus:border-accent focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="bg-accent hover:bg-accent-light text-surface-900 font-semibold px-3 py-1 rounded text-sm transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? '...' : 'Passwort ändern'}
+          </button>
+          <button type="button" onClick={resetForm} className="text-gray-500 hover:text-gray-300">✕</button>
+          {error && <span className="text-red-400 text-xs max-w-48 truncate" title={error}>{error}</span>}
+        </form>
+      </div>
+    );
+  }
+
+  // Login/Register-Formular
   const isLogin = view === 'login';
 
   return (
@@ -141,6 +257,15 @@ export default function AuthBar({ user, isAuthenticated, storageInfo, onLogin, o
           >
             {isSubmitting ? '...' : isLogin ? 'Login' : 'Registrieren'}
           </button>
+          {isLogin && (
+            <button
+              type="button"
+              onClick={() => { setError(''); setPassword(''); setView('forgot'); }}
+              className="text-gray-500 hover:text-accent text-xs transition-colors"
+            >
+              Passwort vergessen?
+            </button>
+          )}
           <button
             type="button"
             onClick={resetForm}

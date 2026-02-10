@@ -38,3 +38,36 @@ export async function sendVerificationEmail(email, token) {
     return false;
   }
 }
+
+export async function sendPasswordResetEmail(email, token) {
+  const resetUrl = `${BASE_URL}/?reset-token=${token}`;
+
+  try {
+    await resend.emails.send({
+      from: 'PGN-Datenbank <noreply@martuni.de>',
+      to: email,
+      subject: 'Passwort zurücksetzen – Schach PGN-Datenbank',
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2>Passwort zurücksetzen</h2>
+          <p>Sie haben eine Passwort-Zurücksetzung für Ihr Konto bei der Schach PGN-Datenbank angefordert.</p>
+          <p>Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:</p>
+          <p style="margin: 24px 0;">
+            <a href="${resetUrl}"
+               style="background: #d4a843; color: #1a1a2e; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+              Passwort zurücksetzen
+            </a>
+          </p>
+          <p style="color: #666; font-size: 14px;">
+            Der Link ist 1 Stunde gültig. Falls Sie keine Zurücksetzung angefordert haben, können Sie diese Email ignorieren.
+          </p>
+        </div>
+      `,
+    });
+    console.log('[email] Passwort-Reset-Email gesendet an:', email);
+    return true;
+  } catch (err) {
+    console.error('[email] Fehler beim Senden:', err);
+    return false;
+  }
+}

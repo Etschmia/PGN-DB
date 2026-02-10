@@ -12,6 +12,8 @@ export interface UseAuthReturn {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<string>;
   logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<string>;
+  resetPassword: (token: string, password: string) => Promise<void>;
   refreshStorageInfo: () => Promise<void>;
 }
 
@@ -75,6 +77,17 @@ export function useAuth(): UseAuthReturn {
     setStorageInfo(null);
   }, []);
 
+  const forgotPassword = useCallback(async (email: string): Promise<string> => {
+    const result = await authService.forgotPassword(email);
+    return result.message;
+  }, []);
+
+  const resetPassword = useCallback(async (token: string, password: string) => {
+    const result = await authService.resetPassword(token, password);
+    setUser(result.user);
+    setStorageMode(true);
+  }, []);
+
   return {
     user,
     isAuthenticated,
@@ -83,6 +96,8 @@ export function useAuth(): UseAuthReturn {
     login,
     register,
     logout,
+    forgotPassword,
+    resetPassword,
     refreshStorageInfo,
   };
 }

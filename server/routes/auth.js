@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import pool from '../db.js';
 import { requireAuth, signToken } from '../middleware/auth.js';
-import { sendVerificationEmail } from '../utils/email.js';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email.js';
 
 const router = Router();
 
@@ -151,6 +151,90 @@ router.post('/login', loginLimiter, async (req, res) => {
 router.post('/logout', (_req, res) => {
   res.clearCookie('pgn_token', { path: '/' });
   res.json({ message: 'Erfolgreich abgemeldet' });
+});
+
+// Rate Limiting für Passwort-Reset
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Zu viele Anfragen. Bitte warten Sie 15 Minuten.' },
+});
+
+// POST /api/pgn/auth/forgot-password
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email-Adresse erforderlich' });
+    }
+
+    // Immer gleiche Antwort (kein Leak ob Email existiert)
+    const successMessage = 'Falls ein Konto mit dieser Email existiert, wurde ein Link zum Zurücksetzen gesendet.';
+
+    const result = await pool.query('SELECT id, email, verified FROM users WHERE email = $1', [email.toLowerCase()]);
+
+    if (result.rows.length === 0 || !result.rows[0].verified) {
+      return res.json({ message: successMessage });
+    }
+
+    const user = result.rows[0];
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 Stunde
+
+    await pool.query(
+      'UPDATE users SET reset_token = $1, reset_expires = $2, updated_at = NOW() WHERE id = $3',
+      [resetToken, resetExpires, user.id]
+    );
+
+    await sendPasswordResetEmail(user.email, resetToken);
+
+    res.json({ message: successMessage });
+  } catch (err) {
+    console.error('[auth] Forgot-Password-Fehler:', err);
+    res.status(500).json({ error: 'Interner Serverfehler' });
+  }
+});
+
+// POST /api/pgn/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ error: 'Token und Passwort erforderlich' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Passwort muss mindestens 8 Zeichen lang sein' });
+    }
+
+    const result = await pool.query(
+      'SELECT id, email FROM users WHERE reset_token = $1 AND reset_expires > NOW()',
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: 'Ungültiger oder abgelaufener Reset-Link' });
+    }
+
+    const user = result.rows[0];
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await pool.query(
+      'UPDATE users SET password_hash = $1, reset_token = NULL, reset_expires = NULL, updated_at = NOW() WHERE id = $2',
+      [passwordHash, user.id]
+    );
+
+    // Automatisch einloggen
+    const jwtToken = signToken(user.id, user.email);
+    res.cookie('pgn_token', jwtToken, COOKIE_OPTIONS);
+
+    res.json({ user: { id: user.id, email: user.email } });
+  } catch (err) {
+    console.error('[auth] Reset-Password-Fehler:', err);
+    res.status(500).json({ error: 'Interner Serverfehler' });
+  }
 });
 
 // GET /api/pgn/auth/me

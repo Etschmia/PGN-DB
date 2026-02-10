@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS users (
   verified BOOLEAN DEFAULT FALSE,
   verify_token VARCHAR(64),
   verify_expires TIMESTAMPTZ,
+  reset_token VARCHAR(64),
+  reset_expires TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
