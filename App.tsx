@@ -8,6 +8,15 @@ import type { Move } from './types';
 import { ChessIcon } from './components/Icons';
 import ChessboardWrapper from './components/ChessboardWrapper';
 import AuthBar from './components/AuthBar';
+
+// TimeControl formatieren: "300+0" → "5+0", "900+10" → "15+10"
+const formatTimeControl = (tc: string | undefined): string | null => {
+  if (!tc || tc === '-') return null;
+  const match = tc.match(/^(\d+)\+(\d+)$/);
+  if (!match) return tc;
+  const minutes = Math.round(parseInt(match[1]) / 60);
+  return `${minutes}+${match[2]}`;
+};
 const DatabaseList = lazy(() => import('./components/DatabaseList'));
 const FilterBar = lazy(() => import('./components/FilterBar'));
 const DatabaseControls = lazy(() => import('./components/DatabaseControls'));
@@ -46,7 +55,7 @@ export default function App() {
     clearDatabase,
     updateFilters,
     resetFilters,
-    getUniqueOpenings,
+    uniqueOpenings,
     refreshGames,
   } = usePgnDatabase();
 
@@ -186,14 +195,13 @@ export default function App() {
 
   const currentMove: Move | undefined = moves[currentIndex];
 
-  // TimeControl formatieren: "300+0" → "5+0", "900+10" → "15+10"
-  const formatTimeControl = (tc: string | undefined): string | null => {
-    if (!tc || tc === '-') return null;
-    const match = tc.match(/^(\d+)\+(\d+)$/);
-    if (!match) return tc;
-    const minutes = Math.round(parseInt(match[1]) / 60);
-    return `${minutes}+${match[2]}`;
-  };
+  // Passwort-Reset-Handler (memoisiert statt Inline-Lambda)
+  const handleResetPassword = useCallback(async (token: string, password: string) => {
+    await resetPassword(token, password);
+    setResetToken(null);
+    setSuccess('Passwort erfolgreich geändert! Sie sind jetzt eingeloggt.');
+    setTimeout(() => setSuccess(null), 6000);
+  }, [resetPassword]);
 
   // Tastaturnavigation für Züge
   useEffect(() => {
@@ -256,12 +264,7 @@ export default function App() {
             onRegister={register}
             onLogout={logout}
             onForgotPassword={forgotPassword}
-            onResetPassword={async (token, password) => {
-              await resetPassword(token, password);
-              setResetToken(null);
-              setSuccess('Passwort erfolgreich geändert! Sie sind jetzt eingeloggt.');
-              setTimeout(() => setSuccess(null), 6000);
-            }}
+            onResetPassword={handleResetPassword}
             resetToken={resetToken}
           />
         )}
@@ -306,7 +309,7 @@ export default function App() {
                 filters={filters}
                 onUpdateFilters={updateFilters}
                 onResetFilters={resetFilters}
-                uniqueOpenings={getUniqueOpenings()}
+                uniqueOpenings={uniqueOpenings}
                 totalGames={games.length}
                 filteredGames={filteredGames.length}
               />

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { GameRecord, GameFilters } from '../types';
 import * as db from '../services/storageService';
 import { parseMultiGamePgn } from './useChessGame';
@@ -104,8 +104,8 @@ export const usePgnDatabase = () => {
     setSelectedGameId(id);
   }, []);
 
-  // Get the currently selected game
-  const getSelectedGame = useCallback((): GameRecord | null => {
+  // Aktuell ausgewählte Partie (memoisiert)
+  const selectedGame = useMemo((): GameRecord | null => {
     if (selectedGameId === null) return null;
     return games.find(g => g.id === selectedGameId) || null;
   }, [selectedGameId, games]);
@@ -167,15 +167,15 @@ export const usePgnDatabase = () => {
     }
   }, []);
 
-  // Filter and sort games
-  const getFilteredGames = useCallback((): GameRecord[] => {
+  // Gefilterte Partien (memoisiert statt bei jedem Render neu berechnet)
+  const filteredGames = useMemo((): GameRecord[] => {
     let filtered = [...games];
 
     // Search text (player names)
     if (filters.searchText) {
       const searchLower = filters.searchText.toLowerCase();
       filtered = filtered.filter(
-        g => 
+        g =>
           g.white.toLowerCase().includes(searchLower) ||
           g.black.toLowerCase().includes(searchLower)
       );
@@ -201,7 +201,7 @@ export const usePgnDatabase = () => {
 
     // Tags filter
     if (filters.tags.length > 0) {
-      filtered = filtered.filter(g => 
+      filtered = filtered.filter(g =>
         filters.tags.some(tag => g.tags.includes(tag))
       );
     }
@@ -226,25 +226,25 @@ export const usePgnDatabase = () => {
     });
   }, []);
 
-  // Get unique openings from all games
-  const getUniqueOpenings = useCallback((): string[] => {
+  // Eindeutige Eröffnungen (memoisiert)
+  const uniqueOpenings = useMemo((): string[] => {
     const openings = games
       .map(g => g.opening)
       .filter(o => o && o !== '');
     return Array.from(new Set(openings)).sort();
   }, [games]);
 
-  // Get unique tags from all games
-  const getUniqueTags = useCallback((): string[] => {
+  // Eindeutige Tags (memoisiert)
+  const uniqueTags = useMemo((): string[] => {
     const allTags = games.flatMap(g => g.tags);
     return Array.from(new Set(allTags)).sort();
   }, [games]);
 
   return {
     games,
-    filteredGames: getFilteredGames(),
+    filteredGames,
     selectedGameId,
-    selectedGame: getSelectedGame(),
+    selectedGame,
     filters,
     isLoading,
     importPgnFile,
@@ -256,8 +256,8 @@ export const usePgnDatabase = () => {
     clearDatabase,
     updateFilters,
     resetFilters,
-    getUniqueOpenings,
-    getUniqueTags,
+    uniqueOpenings,
+    uniqueTags,
     refreshGames: loadGamesFromDB,
   };
 };
