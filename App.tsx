@@ -1,9 +1,10 @@
 
-import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense, useRef } from 'react';
 import { useChessGame } from './hooks/useChessGame';
 import { usePgnDatabase } from './hooks/usePgnDatabase';
 import { useOpeningLookup } from './hooks/useOpeningLookup';
 import { useAuth } from './hooks/useAuth';
+import { useIsMobile } from './hooks/useIsMobile';
 import type { Move } from './types';
 import { ChessIcon } from './components/Icons';
 import ChessboardWrapper from './components/ChessboardWrapper';
@@ -84,6 +85,10 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [resetToken, setResetToken] = useState<string | null>(null);
+  const [mobileView, setMobileView] = useState<'list' | 'board'>('list');
+  const boardViewRef = useRef<HTMLDivElement | null>(null);
+
+  const isMobile = useIsMobile();
 
   // URL-Parameter erkennen
   useEffect(() => {
@@ -247,6 +252,21 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedGame, moves.length, currentIndex, goToMove]);
 
+  // Auf Mobile beim Wechsel in die Brettansicht nach oben scrollen,
+  // damit das Brett nicht außerhalb des sichtbaren Bereichs bleibt.
+  useEffect(() => {
+    if (!isMobile) return;
+    if (mobileView !== 'board') return;
+    if (!selectedGame) return;
+
+    const node = boardViewRef.current;
+    if (node) {
+      node.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [isMobile, mobileView, selectedGame?.id]);
+
   return (
     <div className="min-h-screen bg-surface-900 text-gray-200 font-sans flex flex-col">
       {/* Header */}
@@ -285,8 +305,13 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-grow flex overflow-hidden">
-        {/* Left Panel - Database */}
-        <div className="w-full lg:w-2/5 xl:w-1/3 border-r border-surface-500 flex flex-col bg-surface-800">
+        {/* Left Panel - Database (auf Mobile nur bei mobileView === 'list') */}
+        <div
+          className={`
+            w-full lg:w-2/5 xl:w-1/3 border-r border-surface-500 flex flex-col bg-surface-800
+            ${isMobile && mobileView !== 'list' ? 'hidden' : ''}
+          `}
+        >
           {/* Database Controls */}
           <div className="p-4 border-b border-surface-500">
             <Suspense fallback={<div className="animate-pulse bg-surface-600 h-10 rounded"></div>}>
@@ -323,14 +348,21 @@ export default function App() {
                 games={filteredGames}
                 selectedGameId={selectedGameId}
                 onSelectGame={selectGame}
+                onSelectAndShowBoard={isMobile ? (id) => { selectGame(id); setMobileView('board'); } : undefined}
                 onDeleteGame={deleteGame}
               />
             </Suspense>
           </div>
         </div>
 
-        {/* Right Panel - Game Viewer */}
-        <div className="flex-grow flex flex-col overflow-hidden bg-surface-900">
+        {/* Right Panel - Game Viewer (auf Mobile nur bei mobileView === 'board') */}
+        <div
+          className={`
+            flex-grow flex flex-col overflow-hidden bg-surface-900
+            ${isMobile && mobileView !== 'board' ? 'hidden' : ''}
+          `}
+          ref={boardViewRef}
+        >
           {!selectedGame ? (
             <div className="flex-grow flex flex-col items-center justify-center text-gray-500 p-8">
               <ChessIcon className="w-32 h-32 mb-6 text-surface-400" />
@@ -338,9 +370,24 @@ export default function App() {
               <p className="text-sm mt-2">Wählen Sie eine Partie aus der Liste oder importieren Sie eine PGN-Datei</p>
             </div>
           ) : (
-            <div className="flex-grow flex flex-col lg:flex-row overflow-hidden">
+            <div className="flex-grow flex flex-col lg:flex-row overflow-hidden min-h-0">
+              {/* Mobile: Zurück zur Liste */}
+              {isMobile && (
+                <div className="flex-shrink-0 p-3 border-b border-surface-500 bg-surface-800">
+                  <button
+                    type="button"
+                    onClick={() => setMobileView('list')}
+                    className="flex items-center gap-2 text-accent hover:text-accent-light font-semibold"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Zurück zur Liste
+                  </button>
+                </div>
+              )}
               {/* Chessboard Column */}
-              <div className="lg:w-3/5 flex flex-col p-4 overflow-auto">
+              <div className="lg:w-3/5 flex flex-col p-4 overflow-auto min-h-0 flex-grow min-w-0">
                 <div className="flex-shrink-0 mb-4">
                   <h2 className="text-xl font-bold mb-2 text-accent-light">
                     {selectedGame.white} vs {selectedGame.black}
@@ -351,7 +398,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 w-full max-w-[600px] mx-auto aspect-square mb-4">
+                {/* Brett: auf Mobile priorisieren (aspect-square, min-w-0 verhindert Overflow) */}
+                <div className="flex-shrink-0 w-full min-w-0 max-w-[600px] mx-auto aspect-square mb-4">
                   <ChessboardWrapper fen={fen} />
                 </div>
 

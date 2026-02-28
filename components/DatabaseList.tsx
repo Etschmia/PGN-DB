@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type { GameRecord } from '../types';
 
 interface DatabaseListProps {
   games: GameRecord[];
   selectedGameId: number | null;
   onSelectGame: (id: number) => void;
+  /** Bei Doppelklick auf eine Partie (z. B. Mobile): Partie wählen und Brett-Ansicht anzeigen */
+  onSelectAndShowBoard?: (id: number) => void;
   onDeleteGame: (id: number) => void;
 }
 
@@ -12,8 +14,27 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
   games,
   selectedGameId,
   onSelectGame,
+  onSelectAndShowBoard,
   onDeleteGame,
 }) => {
+  const pendingTap = useRef<{ id: number; timeout: ReturnType<typeof setTimeout> } | null>(null);
+
+  const handleRowClick = (gameId: number) => {
+    if (onSelectAndShowBoard && pendingTap.current?.id === gameId && pendingTap.current?.timeout) {
+      clearTimeout(pendingTap.current.timeout);
+      pendingTap.current = null;
+      onSelectAndShowBoard(gameId);
+      return;
+    }
+    if (pendingTap.current?.timeout) clearTimeout(pendingTap.current.timeout);
+    pendingTap.current = {
+      id: gameId,
+      timeout: setTimeout(() => {
+        onSelectGame(gameId);
+        pendingTap.current = null;
+      }, 300),
+    };
+  };
   if (games.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
@@ -51,7 +72,7 @@ const DatabaseList: React.FC<DatabaseListProps> = ({
           {games.map((game) => (
             <tr
               key={game.id}
-              onClick={() => game.id && onSelectGame(game.id)}
+              onClick={() => game.id && handleRowClick(game.id)}
               className={`
                 cursor-pointer hover:bg-surface-600 transition-colors border-b border-surface-500
                 ${selectedGameId === game.id ? 'bg-accent/10' : ''}
