@@ -11,15 +11,15 @@
   "dependencies": {
     "chess.js": "^1.4.0",
     "react": "^19.2.4",
-    "react-chessboard": "^5.8.6",
+    "react-chessboard": "5.10.0",
     "react-dom": "^19.2.4"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.18",
+    "@tailwindcss/vite": "4.2.2",
     "@types/node": "^22.19.7",
-    "@vitejs/plugin-react": "^5.1.2",
-    "tailwindcss": "^4.1.18",
-    "typescript": "~5.8.3",
-    "vite": "^7.3.1"
+    "@vitejs/plugin-react": "6",
+    "tailwindcss": "4.2.2",
+    "typescript": "5.9.3",
+    "vite": "8"
   }
 }

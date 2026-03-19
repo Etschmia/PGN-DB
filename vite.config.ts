@@ -24,11 +24,14 @@ export default defineConfig(() => {
       build: {
         rollupOptions: {
           output: {
-            manualChunks: {
-              // React-Bibliotheken in separaten Chunk
-              'react-vendor': ['react', 'react-dom'],
-              // Schach-Bibliotheken in separaten Chunk
-              'chess-vendor': ['chess.js', 'react-chessboard'],
+            // Rolldown (Vite 8) erfordert manualChunks als Funktion
+            manualChunks(id) {
+              if (id.includes('react-dom') || id.includes('react/')) {
+                return 'react-vendor';
+              }
+              if (id.includes('chess.js') || id.includes('react-chessboard')) {
+                return 'chess-vendor';
+              }
             }
           }
         },
