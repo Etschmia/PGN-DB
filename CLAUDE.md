@@ -104,7 +104,7 @@ bun run start              # Production-Start
 
 ## Related Tools
 
-**`indexierung/`** — Standalone-Python-Toolset (separater Anwendungsfall: lokales PGN-Archiv via SQLite, *nicht* Teil der Web-App). Indexiert ein Verzeichnis voller Einzel-PGN-Dateien (z.B. `/home/librechat/lichess-bot/game_archiv`) in eine SQLite-DB und stellt eine CLI für Filter/Statistik bereit. Aufruf via globalem Wrapper `pgn` (`~/.local/bin/pgn`), der die Skripte aus `indexierung/` mit dem dedizierten venv unter `~/pgn-tool/.venv` (python-chess) ausführt. DB-Default: `~/pgn-tool/games.db`. Siehe `indexierung/README.md`.
+**`indexierung/`** — Standalone-Python-Toolset (separater Anwendungsfall: lokales PGN-Archiv via SQLite, *nicht* Teil der Web-App). Indexiert ein Verzeichnis voller Einzel-PGN-Dateien (z.B. `/home/librechat/lichess-bot/game_archiv`) in eine SQLite-DB und stellt eine CLI für Filter/Statistik bereit. Aufruf via globalem Wrapper `pgn` (`~/.local/bin/pgn`), der die Skripte aus `indexierung/` mit dem dedizierten venv unter `~/pgn-tool/.venv` (python-chess + textual) ausführt. `pgn tui` öffnet einen interaktiven Textual-Browser (Filterzeile, Trefferliste, PGN-Vorschau). DB-Default: `~/pgn-tool/games.db`. Siehe `indexierung/README.md`.
 
 ## Known Issues
 

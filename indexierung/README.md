@@ -8,12 +8,40 @@ Auf Debian 13 ist `pip install` system-weit blockiert (PEP 668). Daher: dedizier
 # venv anlegen + python-chess installieren
 mkdir -p ~/pgn-tool
 python3 -m venv ~/pgn-tool/.venv
-~/pgn-tool/.venv/bin/pip install chess
+~/pgn-tool/.venv/bin/pip install chess textual
 
 # Skripte bleiben hier im Repo (Single-Source) — keine Kopie nötig.
 # Wrapper ist global verfügbar als `pgn`:
 ls -la ~/.local/bin/pgn
 ```
+
+## Interaktiver Browser (TUI)
+
+Ein Textual-basiertes Terminal-UI im Stil von Midnight Commander / Claude Code:
+
+```bash
+pgn tui
+```
+
+Aufbau:
+- **Filterzeile oben**: Spieler · Gegner · ECO · Eröffnung · Ergebnis (`win`/`loss`/`draw`).
+  Tippen filtert live, der Spieler ist auf `Martuni` vorbelegt (Override via `PGN_TOOL_PLAYER`).
+- **Mittlere Tabelle**: Treffer (max. 500), neueste zuerst.
+- **Vorschau unten**: PGN der hervorgehobenen Partie (folgt automatisch beim Pfeil hoch/runter).
+
+Tasten:
+
+| Taste | Aktion |
+|-------|--------|
+| `↑` / `↓` | Partie wählen, Vorschau aktualisiert sich automatisch |
+| `Enter` | Vorschau erzwingen |
+| `/` | Fokus auf erste Filterbox (Spieler) |
+| `Esc` | Fokus zurück auf Tabelle |
+| `Ctrl+R` | DB neu laden |
+| `q` | Beenden |
+
+Setup-Hinweis: braucht `textual` im venv (`~/pgn-tool/.venv/bin/pip install textual`).
+Das ist bereits installiert; bei einem frischen venv einmal nachholen.
 
 ## Schnellstart via Wrapper
 
