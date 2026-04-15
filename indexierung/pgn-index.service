@@ -1,0 +1,78 @@
+# =============================================================================
+# pgn-index.service + pgn-index.timer
+# Automatische Neu-Indexierung bei Dateiänderungen via systemd
+#
+# Installation auf Debian 13:
+#   sudo cp pgn-index.service /etc/systemd/system/
+#   sudo cp pgn-index.timer   /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now pgn-index.timer
+#
+# Manuell starten:
+#   sudo systemctl start pgn-index.service
+#   journalctl -u pgn-index.service -f
+# =============================================================================
+
+# --- /etc/systemd/system/pgn-index.service ---
+
+[Unit]
+Description=PGN SQLite Indexer (inkrementell)
+After=network.target
+
+[Service]
+Type=oneshot
+
+# Anpassen:
+User=debian
+WorkingDirectory=/home/debian/pgn-tool
+
+ExecStart=/usr/bin/python3 /home/debian/pgn-tool/pgn_index.py \
+    --pgn-dir /home/debian/pgn \
+    --db      /home/debian/pgn-tool/games.db
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pgn-index
+
+# Ressourcen schonen (läuft im Hintergrund)
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+
+# --- /etc/systemd/system/pgn-index.timer ---
+
+[Unit]
+Description=PGN-Indexer stündlich ausführen
+Requires=pgn-index.service
+
+[Timer]
+# Alle 60 Minuten, auch nach Boot nachholen falls verpasst
+OnBootSec=5min
+OnUnitActiveSec=60min
+AccuracySec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+
+# =============================================================================
+# Alternative: inotifywait (sofortige Reaktion auf neue Dateien)
+# apt install inotify-tools
+#
+# /home/debian/pgn-tool/watch_pgn.sh:
+# #!/bin/bash
+# inotifywait -m -r -e close_write,moved_to --include '\.pgn$' /home/debian/pgn \
+#   | while read dir event file; do
+#       echo "Neue/geänderte Datei: $dir$file"
+#       python3 /home/debian/pgn-tool/pgn_index.py \
+#           --pgn-dir /home/debian/pgn \
+#           --db      /home/debian/pgn-tool/games.db
+#     done
+#
+# Als Service:
+#   ExecStart=/home/debian/pgn-tool/watch_pgn.sh
+#   Type=simple
+#   Restart=always
+# =============================================================================
